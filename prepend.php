@@ -60,6 +60,9 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
             	$table_prefix = $wp_normal_config_file->get_key( 'table_prefix' );	
             	$wp_normal_config_file->set_type( 'php-define' );
             	
+            	$wp_home = $wp_normal_config_file->get_key( 'WP_HOME' );
+            	$wp_siteurl = $wp_normal_config_file->get_key( 'WP_SITEURL' );
+            	
             	// Collect Multisite configuration data
             	$wp_allow_multisite = $wp_normal_config_file->get_key( 'WP_ALLOW_MULTISITE' );
             	$multisite = $wp_normal_config_file->get_key( 'MULTISITE' );
@@ -76,6 +79,15 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
             	$clean_config_file->set_key( 'DB_NAME', $db_user );
             	$clean_config_file->set_key( 'DB_PASSWORD', $db_password );
 	        	$clean_config_file->set_key( 'DB_HOST', '127.0.0.1' );
+	        	
+	        	if ( !empty( $wp_home ) ) {
+	        		$clean_config_file->set_key( 'WP_HOME', '' );
+	        	}
+	        	
+	        	if ( !empty( $wp_siteurl ) ) {
+	        		$clean_config_file->set_key( 'WP_SITEURL', '' );
+	        	}
+	        	
 
             	// Set the salts
             	$clean_config_file->set_key( 'AUTH_KEY', DS_Utils::random_salt() );
@@ -100,7 +112,46 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
 
             	$clean_config_file->set_type( 'php-variable' );
             	$clean_config_file->set_key( 'table_prefix', $table_prefix );
+            		
+                /*
+                 * Flywheel specific actions
+                 *
+                 */
+            	$is_flywheel_config_file = false;
+            	$flywheel_constants = array(
+                	'FLYWHEEL_PLUGIN_DIR',
+            	);
+            	trace($flywheel_constants);
+            	foreach ($flywheel_constants as $constant ) {
+                	$config_value = $wp_normal_config_file->get_key( $constant );
+                	trace($config_value);
+                	if ( !empty( $config_value ) ) {
+                    	$is_flywheel_config_file = true;
+                    	trace($is_flywheel_config_file);
+                    	//require __DIR__ . '/inc/flywheel.php';
+                	}
+            	}
+       	
+            	
+                /*
+                 * WPEngine specific actions
+                 *
+                 */
+            	$is_wpengine_config_file = false;
+            	$wpengine_constants = array(
+                	'WPE_APIKEY',
+                	'WPE_SFTP_PORT',
+                	'WPE_CLUSTER_ID',
+            	);
+            	foreach ($wpengine_constants as $constant ) {
+                	$config_value = $wp_normal_config_file->get_key( $constant );
+                	if ( !empty( $config_value ) ) {
+                    	$is_wpengine_config_file = true;
+                    	// require __DIR__ . '/inc/wpengine.php';
+                	}
+            	}
 
+				//Saves config
             	$clean_config_file->save( $wpconfig );
 
             	// See if mu-plugins folder exists, if does rename
@@ -256,52 +307,9 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
   					$newdata[] = $filerow;
 				}
 				file_put_contents($wpconfig, $newdata);
-				
-                /*
-                 * Flywheel specific actions
-                 *
-                 */
-            	$is_flywheel_config_file = false;
-            	$flywheel_constants = array(
-                	'FLYWHEEL_PLUGIN_DIR',
-            	);
-            	foreach ($flywheel_constants as $constant ) {
-                	$config_value = $flywheel_config_file->get_key( $constant );
-                	if ( !empty( $config_value ) ) {
-                    	$is_flywheel_config_file = true;
-                	}
-            	}
-            	if ( !$is_flywheel_config_file ) {
-                	return;
-            	}
-            	
-            	// require __DIR__ . '/inc/flywheel.php';
-            	trace(' End of Flywheel actions ');
-            	
-                /*
-                 * WPEngine specific actions
-                 *
-                 */
-            	$is_wpengine_config_file = false;
-            	$wpengine_constants = array(
-                	'WPE_APIKEY',
-                	'WPE_SFTP_PORT',
-                	'WPE_CLUSTER_ID',
-            	);
-            	foreach ($wpengine_constants as $constant ) {
-                	$config_value = $wpengine_config_file->get_key( $constant );
-                	if ( !empty( $config_value ) ) {
-                    	$is_wpengine_config_file = true;
-                	}
-            	}
-            	if ( !$is_wpengine_config_file ) {
-                	return;
-            	}
-            	
-            	// require __DIR__ . '/inc/wpengine.php';
-            	trace(' End of WPEngine actions ');
  				
             }
+            trace(' End of script! ');
         }
     }
 
