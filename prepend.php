@@ -5,12 +5,16 @@ if ( !$ds_runtime->is_localhost ) return;
 if ( $ds_runtime->last_ui_event === false ) return;
 if ( $ds_runtime->last_ui_event->action !== "site_imported" ) return;
 
-// Get classes
+/**
+ * Get classes
+ */
 include_once( $ds_runtime->htdocs_dir . '/classes/string.php' );
 include_once( $ds_runtime->htdocs_dir . '/classes/class-ds-utils.php' );
 include_once( $ds_runtime->htdocs_dir . '/classes/class-ds-config-file.php' );
 
-// Implement Developer reset
+/** 
+ * Implement Clean Import
+ */
 if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
 
     class DS_Clean_Import {
@@ -21,15 +25,12 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
             if ( $ds_runtime->last_ui_event === false ) return;
             if ( $ds_runtime->last_ui_event->action === 'site_imported' ) {
 
-				trace(' Begin! ');
 				// Collect needed configuration info
                 $siteName = $ds_runtime->last_ui_event->info[0];
-                $mu_plugins = $ds_runtime->preferences->sites->{$siteName}->sitePath . '/wp-content/mu-plugins';
                 $advanced_cache = $ds_runtime->preferences->sites->{$siteName}->sitePath . '/wp-content/advanced-cache.php';
                 $object_cache = $ds_runtime->preferences->sites->{$siteName}->sitePath . '/wp-content/object-cache.php';
                 $cache_dir = $ds_runtime->preferences->sites->{$siteName}->sitePath . '/wp-content/cache';
                 $wpconfig = $ds_runtime->preferences->sites->{$siteName}->sitePath . '/wp-config.php';
-                $wpsettings = $ds_runtime->preferences->sites->{$siteName}->sitePath . '/wp-settings.php';
                 $htaccess = $ds_runtime->preferences->sites->{$siteName}->sitePath . '/.htaccess';
                 
                 // WP3 Total Cache
@@ -49,7 +50,7 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
                 
                 // Backup the wp-config file
             	if ( file_exists( $wpconfig ) ) {
-                	copy( $wpconfig, $wpconfig . '-sav' );
+                	copy( $wpconfig, $wpconfig . '-sav-' . time()  );
             	}
             	
                 // Collect wp-config data
@@ -88,7 +89,6 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
 	        		$clean_config_file->set_key( 'WP_SITEURL', '' );
 	        	}
 	        	
-
             	// Set the salts
             	$clean_config_file->set_key( 'AUTH_KEY', DS_Utils::random_salt() );
             	$clean_config_file->set_key( 'SECURE_AUTH_KEY', DS_Utils::random_salt() );
@@ -113,29 +113,24 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
             	$clean_config_file->set_type( 'php-variable' );
             	$clean_config_file->set_key( 'table_prefix', $table_prefix );
             		
-                /*
+                /**
                  * Flywheel specific actions
-                 *
                  */
             	$is_flywheel_config_file = false;
             	$flywheel_constants = array(
                 	'FLYWHEEL_PLUGIN_DIR',
             	);
-            	trace($flywheel_constants);
             	foreach ($flywheel_constants as $constant ) {
                 	$config_value = $wp_normal_config_file->get_key( $constant );
-                	trace($config_value);
                 	if ( !empty( $config_value ) ) {
                     	$is_flywheel_config_file = true;
-                    	trace($is_flywheel_config_file);
-                    	//require __DIR__ . '/inc/flywheel.php';
+                    	
+                    	require dirname( __FILE__ ) . '/inc/flywheel.php';		
                 	}
             	}
-       	
-            	
-                /*
+       			
+                /**
                  * WPEngine specific actions
-                 *
                  */
             	$is_wpengine_config_file = false;
             	$wpengine_constants = array(
@@ -147,109 +142,49 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
                 	$config_value = $wp_normal_config_file->get_key( $constant );
                 	if ( !empty( $config_value ) ) {
                     	$is_wpengine_config_file = true;
-                    	// require __DIR__ . '/inc/wpengine.php';
+                    	
+                    	require dirname( __FILE__ ) . '/inc/wpengine.php';
                 	}
-            	}
-
-				//Saves config
-            	$clean_config_file->save( $wpconfig );
-
-            	// See if mu-plugins folder exists, if does rename
-            	if ( is_dir( $mu_plugins ) ) {
-
-                	rename( $mu_plugins, $mu_plugins . '-sav' ); 
             	}
             	
                 // See if .htaccess exists, if does rename
                 if ( file_exists( $htaccess ) ) {
-                   
-                   rename( $htaccess, $htaccess . '-sav' );  
+                   rename( $htaccess, $htaccess . '-'.time() );  
                 }
 
                 // Create default WordPress .htaccess file
                 $txt = '';
-                if ( PHP_OS == 'Darwin' ){
-                    // Do Mac stuff
-                    $txt  = "# Reset by DesktopServer\n";
-                    $txt .= "# BEGIN WordPress \n";
-                    $txt .= "<IfModule mod_rewrite.c> \n";
-                    $txt .= "Rewrite_normal On \n";
-                    $txt .= "RewriteBase / \n";
-                    $txt .= "RewriteRule ^index\.php$ - [L] \n";
-                    $txt .= "RewriteCond %{REQUEST_FILENAME} !-f \n";
-                    $txt .= "RewriteCond %{REQUEST_FILENAME} !-d \n";
-                    $txt .= "RewriteRule . /index.php [L] \n";
-                    $txt .= "</IfModule> \n";
-                    $txt .= "# END WordPress \n"; 
-                }else{
-                    // Do Windows stuff
-                    $txt  = "#Reset by DesktopServer\n";
-                    $txt .= "# BEGIN WordPress \n";
-                    $txt .= "<IfModule mod_rewrite.c> \n";
-                    $txt .= "Rewrite_normal On \n";
-                    $txt .= "RewriteBase / \n";
-                    $txt .= "RewriteRule ^index\.php$ - [L] \n";
-                    $txt .= "RewriteCond %{REQUEST_FILENAME} !-f \n";
-                    $txt .= "RewriteCond %{REQUEST_FILENAME} !-d \n";
-                    $txt .= "RewriteRule . /index.php [L] \n";
-                    $txt .= "</IfModule> \n";
-                    $txt .= "# END WordPress \n";
-                }
+                $txt  = "# Reset by DesktopServer \n";
+                $txt .= "# BEGIN WordPress \n";
+                $txt .= "<IfModule mod_rewrite.c> \n";
+                $txt .= "RewriteEngine On \n";
+                $txt .= "RewriteBase / \n";
+                $txt .= "RewriteRule ^index\.php$ - [L] \n";
+                $txt .= "RewriteCond %{REQUEST_FILENAME} !-f \n";
+                $txt .= "RewriteCond %{REQUEST_FILENAME} !-d \n";
+                $txt .= "RewriteRule . /index.php [L] \n";
+                $txt .= "</IfModule> \n";
+                $txt .= "# END WordPress \n"; 
+
                 file_put_contents( $htaccess, $txt );
                   
-                // See if advanced-cache.php exists, if does rename
-                if ( file_exists( $advanced_cache ) ) {
-                   
-                   rename( $advanced_cache, $advanced_cache . '-sav' );  
-                }
-                
-                // See if object_cache.php exists, if does rename
-                if ( file_exists( $object_cache ) ) {
-                   
-                   rename( $object_cache, $object_cache . '-sav' );   
-                }
-                
-                // See if wp-cache-config.php exists, if does rename
-                if ( file_exists( $wp_super_cache_config ) ) {
-                   
-                   rename( $wp_super_cache_config, $wp_super_cache_config . '-sav' );    
-                }
-                
-                // See if plugins/wp-super-cache folder exists, if does rename
-                if ( is_dir( $wp_super_cache_dir ) ) {
-                
-                    rename( $wp_super_cache_dir, $wp_super_cache_dir . '-sav' ); 
-                }
-                
-                // See if w3tc-config folder exists, if does rename
-                if ( is_dir( $w3tc_config_dir ) ) {
-                
-                    rename( $w3tc_config_dir, $w3tc_config_dir . '-sav' );  
-                }
-                
-                // See if plugins/w3-total-cache folder exists, if does rename
-                if ( is_dir( $w3_total_cache_dir ) ) {
-                
-                    rename( $w3_total_cache_dir, $w3_total_cache_dir . '-sav' );
-                }
-                
-                // See if wp-rocket-config folder exists, if does rename
-                if ( is_dir( $wp_rocket_config_dir ) ) {
-                
-                    rename( $wp_rocket_config_dir, $wp_rocket_config_dir . '-sav' );
-                }
-                
-                // See if plugins/wp-rocket folder exists, if does rename
-                if ( is_dir( $wp_rocket_cache_dir ) ) {
-                
-                    rename( $wp_rocket_cache_dir, $wp_rocket_cache_dir . '-sav' );
-                }
-                
-                // See if ithemes-security-pro folder exists, if does rename
-                if ( is_dir( $ithemes_security_pro ) ) {
-                
-                    rename( $ithemes_security_pro, $ithemes_security_pro . '-sav' );
-                }
+                //Rename cache, security files and folders
+                $files_to_rename = array(
+                  	$advanced_cache,
+                  	$object_cache,
+                  	$wp_super_cache_config,
+                  	$wp_super_cache_dir,
+                  	$w3tc_config_dir,
+                  	$w3_total_cache_dir,
+                  	$wp_rocket_config_dir,
+                  	$wp_rocket_cache_dir,
+                  	$ithemes_security_pro,
+                  );
+                foreach	( $files_to_rename as $file_to_rename ) {
+					if ( file_exists( $file_to_rename ) ) {
+					   rename( $file_to_rename, $file_to_rename . '-sav-' . time() );  
+					}
+                }      
                 
                 // See if cache folder exists, if does delete
                 if ( is_dir( $cache_dir ) ) {
@@ -292,11 +227,13 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
     
                 }
                 
- 				// Read in wp-config.php and comment out cache calls
-				/* 	Regular expression matches:
-				 * 	define('WP_CACHE', true); //Added by WP-Cache Manager
-				 *	define( 'WPCACHEHOME', '//Volumes/Data/Users/GreggFranklin/Documents/Websites/super-cache.dev/wp-content/plugins/wp-super-cache/' ); //Added by WP-Cache Manager
-				 *	define('WP_CACHE', true); // Added by W3 Total Cache
+ 				/**
+ 				 * Read in wp-config.php and comment out cache calls
+ 				 *
+				 * Regular expression matches:
+				 * define('WP_CACHE', true); //Added by WP-Cache Manager
+				 * define( 'WPCACHEHOME', '//Volumes/Data/Users/GreggFranklin/Documents/Websites/super-cache.dev/wp-content/plugins/wp-super-cache/' ); //Added by WP-Cache Manager
+				 * define('WP_CACHE', true); // Added by W3 Total Cache
 				 */
 				$filedata = file($wpconfig);
 				$newdata = preg_replace('/(define\(\s?[\'"]WP_?CACHE)/', '// $1', $filedata);
@@ -309,7 +246,6 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
 				file_put_contents($wpconfig, $newdata);
  				
             }
-            trace(' End of script! ');
         }
     }
 
