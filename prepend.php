@@ -24,16 +24,17 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
 			global $ds_runtime;    
             $siteName = $ds_runtime->last_ui_event->info[0];
             $sitePath = $ds_runtime->preferences->sites->{$siteName}->sitePath;
+            
+            // Find the directory that WordPress is in
             $wpconfig_path = DS_Utils::find_first_file( $sitePath, "wp-config.php" );
 			$path = substr($wpconfig_path, 0, -13);
 
 			// Collect needed configuration info
-            //$siteName = $ds_runtime->last_ui_event->info[0];
             $advanced_cache = $path . '/wp-content/advanced-cache.php';
             $object_cache = $path . '/wp-content/object-cache.php';
             $cache_dir = $path . '/wp-content/cache';
             $wpconfig = $path . '/wp-config.php';
-            $htaccess = $path . '/.htaccess';
+            $htaccess = $sitePath . '/.htaccess';
                 
             // WP3 Total Cache
             $w3tc_config_dir = $path . '/wp-content/w3tc-config';
