@@ -16,5 +16,3 @@ Prepares an archive to be imported smoothly into DesktopServer
 * If plugins/wp-rocket folder exists, if does rename to plugins/wp-rocket-sav
 * If ithemes-security-pro folder exists, if does rename to plugins/ithemes-security-pro-sav
 * If cache folder exists, if does delete
-* Flywheel reset wp-settings.php
-* WPEngine 
