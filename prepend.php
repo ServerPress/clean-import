@@ -35,6 +35,7 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
             $cache_dir = $path . '/wp-content/cache';
             $wpconfig = $path . '/wp-config.php';
             $htaccess = $sitePath . '/.htaccess';
+            $jetpack_dir = $sitePath . '/wp-content/plugins/jetpack';
                 
             // WP3 Total Cache
             $w3tc_config_dir = $path . '/wp-content/w3tc-config';
@@ -50,6 +51,9 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
                 
             // iThemes Security Pro
             $ithemes_security_pro = $path . '/wp-content/plugins/ithemes-security-pro';
+
+            // CDN Enabler - KeyCDN
+            $cdn_enabler = $path . '/wp-content/plugins/cdn-enabler';
                 
             // Backup the wp-config file
             if ( file_exists( $wpconfig ) ) {
@@ -84,14 +88,6 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
             $clean_config_file->set_key( 'DB_PASSWORD', $db_password );
 	        $clean_config_file->set_key( 'DB_HOST', '127.0.0.1' );
 	        	
-	        if ( !empty( $wp_home ) ) {
-	        	$clean_config_file->set_key( 'WP_HOME', '' );
-	        }
-	        	
-	        if ( !empty( $wp_siteurl ) ) {
-	        	$clean_config_file->set_key( 'WP_SITEURL', '' );
-	        }
-	        	
             // Set the salts
             $clean_config_file->set_key( 'AUTH_KEY', DS_Utils::random_salt() );
             $clean_config_file->set_key( 'SECURE_AUTH_KEY', DS_Utils::random_salt() );
@@ -113,9 +109,30 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
                 $clean_config_file->set_key( 'BLOG_ID_CURRENT_SITE', $blog_id_current_site );
             }
 
+            $clean_config_file->isolate_block('The name of the database for WordPress', '/**#@-*/' );
+
+            // Set WP_HOME, WP_SITEURL to nothing
+            if ( !empty( $wp_home ) ) {
+                $clean_config_file->set_key( 'WP_HOME', '' );
+            }
+
+            if ( !empty( $wp_siteurl ) ) {
+                $clean_config_file->set_key( 'WP_SITEURL', '' );
+            }
+
+            // JetPack
+            if ( file_exists ( $jetpack_dir ) ) {
+                $clean_config_file->set_key( 'JETPACK_DEV_DEBUG', "true" );
+            }
+
+            $clean_config_file->isolate_block(null, null );
+
             $clean_config_file->set_type( 'php-variable' );
             $clean_config_file->set_key( 'table_prefix', $table_prefix );
-       			
+            
+            // Save wp-config file
+            $clean_config_file->save( $wpconfig );
+            
             /**
              * WPEngine specific actions
              */
@@ -132,6 +149,7 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
                     	require dirname( __FILE__ ) . '/inc/wpengine.php';
                 }
             }
+        
             	
             // See if .htaccess exists, if does rename
             if ( file_exists( $htaccess ) ) {
@@ -165,6 +183,7 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
                 $wp_rocket_config_dir,
                 $wp_rocket_cache_dir,
                 $ithemes_security_pro,
+                $cdn_enabler,
             );
             
             foreach	( $files_to_rename as $file_to_rename ) {
@@ -231,6 +250,7 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
   					$newdata[] = $filerow;
 				}
 				file_put_contents($wpconfig, $newdata);
+
         }
     }
 
