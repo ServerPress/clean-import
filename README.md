@@ -16,3 +16,7 @@ Prepares an archive to be imported smoothly into DesktopServer
 * If plugins/wp-rocket folder exists, if does rename to plugins/wp-rocket-sav
 * If ithemes-security-pro folder exists, if does rename to plugins/ithemes-security-pro-sav
 * If cache folder exists, if does delete
+* If cdn-enabler folder exists, if does rename to plugins/cdn-enabler-sav
+* If jetpack folder exists, add define( 'JETPACK_DEV_DEBUG', true);
+* If define( 'WP_SITEURL', 'http://example.com/' ); exists in wp-config set to null value
+* If define( 'WP_HOME', 'http://example.com/' ); exists in wp-config set to null value
