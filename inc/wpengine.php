@@ -32,3 +32,18 @@
 				rename( $file_to_rename, $file_to_rename . '-sav-' . time() );  
 			}
         } 
+        
+        // Move and rename database
+        /*
+        trace('Start!');
+        $database = $sitePath . '/wp-content/mysql.sql';
+        trace($database);
+        $new_database = $sitePath . '/database.sql';
+        trace($new_databas);
+            if ( file_exists ( $database ) ) {
+                rename($database,$new_database);
+                trace('rename mysql.sql to database.sql');
+                unlink($database);
+                trace('Delete mysql.sql');
+            }
+        */

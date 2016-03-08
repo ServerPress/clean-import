@@ -133,6 +133,21 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
             // Save wp-config file
             $clean_config_file->save( $wpconfig );
             
+			/**
+             * Flywheel specific actions
+             */
+            $is_flywheel_config_file = false;
+            $flywheel_constants = array(
+                'FLYWHEEL_PLUGIN_DIR',
+            );
+            foreach ($flywheel_constants as $constant ) {
+                $config_value = $wp_normal_config_file->get_key( $constant );
+                if ( !empty( $config_value ) ) {
+                    $is_flywheel_config_file = true;
+                    	require dirname( __FILE__ ) . '/inc/flywheel.php';		
+                }
+            }
+            
             /**
              * WPEngine specific actions
              */
