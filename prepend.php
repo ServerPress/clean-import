@@ -36,6 +36,7 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
             $wpconfig = $path . '/wp-config.php';
             $htaccess = $sitePath . '/.htaccess';
             $jetpack_dir = $sitePath . '/wp-content/plugins/jetpack';
+            $all_in_one_wp_security_and_firewall_dir = $sitePath . '/wp-content/plugins/all-in-one-wp-security-and-firewall';
                 
             // WP3 Total Cache
             $w3tc_config_dir = $path . '/wp-content/w3tc-config';
@@ -190,6 +191,7 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
                 $wp_rocket_cache_dir,
                 $ithemes_security_pro,
                 $cdn_enabler,
+                $all_in_one_wp_security_and_firewall_dir,
             );
             
             foreach	( $files_to_rename as $file_to_rename ) {
