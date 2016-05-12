@@ -111,15 +111,6 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
 
             $clean_config_file->isolate_block('The name of the database for WordPress', '/**#@-*/' );
 
-            // Set WP_HOME, WP_SITEURL to nothing
-            if ( !empty( $wp_home ) ) {
-                $clean_config_file->set_key( 'WP_HOME', '' );
-            }
-
-            if ( !empty( $wp_siteurl ) ) {
-                $clean_config_file->set_key( 'WP_SITEURL', '' );
-            }
-
             // JetPack
             if ( file_exists ( $jetpack_dir ) ) {
                 $clean_config_file->set_key( 'JETPACK_DEV_DEBUG', "true" );
