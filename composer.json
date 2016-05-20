@@ -1,0 +1,16 @@
+{
+    "name": "serverpress/clean-import",
+    "description": "Prepares an archive to be imported smoothly into DesktopServer.",
+    "type": "wordpress-plugin",
+    "license": "GPL",
+    "authors":[
+        {
+            "name": "Gregg Franklin",
+            "email": "gregg@serverpress.com",
+            "homepage": "https://github.com/serverpress"
+        }
+    ],
+    "require": {
+        "composer/installers": "~1.0"
+    }
+}
