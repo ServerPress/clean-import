@@ -8,7 +8,7 @@ if ( $ds_runtime->last_ui_event->action !== "site_imported" ) return;
 /**
  * Get classes
  */
-include_once( $ds_runtime->htdocs_dir . '/classes/string.php' );
+include_once( $ds_runtime->htdocs_dir . '/classes/gstring.php' );
 include_once( $ds_runtime->htdocs_dir . '/classes/class-ds-utils.php' );
 include_once( $ds_runtime->htdocs_dir . '/classes/class-ds-config-file.php' );
 
