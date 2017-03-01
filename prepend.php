@@ -156,6 +156,23 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT' ) ) {
                     	require dirname( __FILE__ ) . '/inc/wpengine.php';
                 }
             }
+            
+            /**
+             * Endurance specific actions
+             */
+            //$is_wpengine_config_file = false;
+            //$wpengine_constants = array(
+            //    'WPE_APIKEY',
+            //    'WPE_SFTP_PORT',
+            //    'WPE_CLUSTER_ID',
+            //);
+            //foreach ($wpengine_constants as $constant ) {
+            //    $config_value = $wp_normal_config_file->get_key( $constant );
+            //    if ( !empty( $config_value ) ) {
+            //        $is_wpengine_config_file = true;
+                    	require dirname( __FILE__ ) . '/inc/endurance.php';
+            //    }
+            //}
         
             	
             // See if .htaccess exists, if does rename
