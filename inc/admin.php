@@ -11,6 +11,7 @@ class DS_Clean_Import_Admin
 	const SETTINGS_PAGE = 'clean-import-options';
 	const SETTINGS_FIELDS = 'clean_import_group';
 	const OPTION_NAME = 'clean-import';
+	const SETTINGS_UPDATED_NOTICE = 'clean-import-settings-saved';
 
 	private $_admin_page = NULL;
 
@@ -248,6 +249,21 @@ class DS_Clean_Import_Admin
 				'disabled' => TRUE,
 			)
 		);
+
+		// handle display of "Settings Saved" notice
+		$key = self::SETTINGS_UPDATED_NOTICE . get_current_user_id();
+		if ( FALSE !== $msg = get_transient( $key ) ) {
+			delete_transient( $key );
+			add_action( 'admin_notices', array( $this, 'show_settings_saved' ) );
+		}
+	}
+	public function show_settings_saved()
+	{
+?>
+		<div class="notice notice-success is-dismissible">
+	        <p><?php _e( 'Your Clean Import changes have been saved and will be used on all future Imports.', 'clean-import' ); ?></p>
+	    </div>
+<?php
 	}
 
 	/**
@@ -314,6 +330,8 @@ class DS_Clean_Import_Admin
 
 		// block the settings from being written to the database
 		add_filter( 'pre_update_option', array( $this, 'block_update_option' ), 10, 3 );
+		// signal display of settings saved message
+		set_transient( self::SETTINGS_UPDATED_NOTICE . get_current_user_id(), '' );
 
 		return NULL;
 	}
@@ -373,7 +391,7 @@ class DS_Clean_Import_Admin
 					self::OPTION_NAME, $name, $key, $key );
 			else
 				printf('<input type="checkbox" name="%s[%s][%s]" value="1" %s /> %s<br/>',
-					self::OPTION_NAME, $name, $key, checked( $value, $defaults[$key], FALSE ), $key );
+					self::OPTION_NAME, $name, $key, checked( $value, isset( $defaults[$key] ) ? $defaults[$key] : $value, FALSE ), $key );
 		}
 		if ( isset( $args['description'] ) )
 			echo '<em>', esc_html( $args['description'] ), '</em>';
