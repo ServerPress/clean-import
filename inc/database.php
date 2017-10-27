@@ -50,8 +50,10 @@ DS_Clean_Import::debug(__METHOD__.'()');
 	private function create_connection()
 	{
 DS_Clean_Import::debug(__METHOD__.'()');
-		set_error_handler( 'ds_trace_error_handler', E_ALL );
-		set_exception_handler( 'ds_trace_exception_handler' );
+		if ( function_exists( 'ds_trace_error_handler' ) )
+			set_error_handler( 'ds_trace_error_handler', E_ALL );
+		if ( function_exists( 'ds_trace_exception_handler' ) )
+			set_exception_handler( 'ds_trace_exception_handler' );
 
 DS_Clean_Import::debug(__METHOD__.'() install=' . $this->install_path . ' site=' . $this->site_path);
 
@@ -96,7 +98,7 @@ DS_Clean_Import::debug(__METHOD__ . "('{$type}')");
 		foreach ( $tables as $table ) {
 			$sql = "SELECT COUNT(*) FROM `{$table}`";
 			$res = $this->_dbc->get_col( $sql );
-			$count = $res[0];
+			$count = empty($res) ? 0 : $res[0];
 DS_Clean_Import::debug(" - there are {$count} records in the `{$table}` table");
 		}
 	}
