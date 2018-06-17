@@ -13,7 +13,7 @@ Text Domain: clean-import
 if ( FALSE === stripos( __DIR__, 'ds-plugins' ) ) {
 	// detect if not in the ds-plugins folder
 	if ( is_admin() )
-		add_action( 'admin_notices', array( $this, 'clean_import_install_message' ) );
+		add_action( 'admin_notices', 'clean_import_install_message' );
 	return;		// do not initialize the rest of the plugin
 }
 
