@@ -21,7 +21,20 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT', FALSE ) ) {
 		public function __construct()
 		{
 			self::$instance = $this;
-			require_once( dirname( __FILE__ ) . '/inc/base.php');
+			require_once( dirname( __FILE__ ) . '/inc/base.php' );
+		}
+
+		/**
+		 * Processor for 'site_preimport' events
+		 */
+		public function pre_import_process()
+		{
+			global $ds_runtime;
+self::debug(__METHOD__.'(): ui event=' . var_export($ds_runtime->last_ui_event, TRUE));
+
+			$this->load_class( 'Duplicator' );
+			$duplicator = new DS_Clean_Import_Duplicator();
+			$duplicator->pre_import_process( $ds_runtime->last_ui_event->info );
 		}
 
 		/**
@@ -297,7 +310,7 @@ DS_Clean_Import::debug(__METHOD__.'() remove any caching settings from wp-config
 //				$newdata[] = $filerow;
 //			}
 			file_put_contents( $wpconfig, $newdata );
-DS_Clean_Import::debug(__METHOD__.'() wrote ' . count( $newdata ) . ' liunes to wp-config');
+DS_Clean_Import::debug(__METHOD__.'() wrote ' . count( $newdata ) . ' lines to wp-config');
 		}
 
 		/**
@@ -348,6 +361,8 @@ return;
 					fflush( self::$_log );
 				}
 			}
+			if ( function_exists( 'trace' ) )
+				trace( $msg );
 		}
 
 		/**
@@ -381,6 +396,7 @@ global $ds_runtime;
 if ( FALSE !== $ds_runtime->last_ui_event )
 	DS_Clean_Import::debug('>>last UI event: "' . $ds_runtime->last_ui_event->action . '"');
 
+// do some checks and exit early if we don't need to process anything
 if ( ! isset($ds_runtime) ) {
 DS_Clean_Import::debug('-no $ds_runtime instance - skipping');
 	return;
@@ -393,12 +409,12 @@ if ( FALSE === $ds_runtime->last_ui_event ) {
 DS_Clean_Import::debug('-last_ui_event is FALSE');
 	return;
 }
-if ( 'site_imported' !== $ds_runtime->last_ui_event->action ) {
-DS_Clean_Import::debug('-action is not "site_imported": ' . $ds_runtime->last_ui_event->action);
+if ( ! in_array( $ds_runtime->last_ui_event->action, array( 'site_imported', 'site_preimport' ) ) ) {
+DS_Clean_Import::debug('-action not triggering initialization: "' . $ds_runtime->last_ui_event->action . '"' );
 	return;
 }
 
-DS_Clean_Import::debug('***have a "site_imported" event - process the site');
+DS_Clean_Import::debug('***have an actionable event - process the site');
 /**
  * Load library classes
  */
@@ -407,6 +423,15 @@ include_once( $ds_runtime->htdocs_dir . '/classes/class-ds-utils.php' );
 include_once( $ds_runtime->htdocs_dir . '/classes/class-ds-config-file.php' );
 
 $clean_import = new DS_Clean_Import();
-$clean_import->process();
+
+switch ( $ds_runtime->last_ui_event->action ) {
+case 'site_preimport':
+	$clean_import->pre_import_process();
+	break;
+
+case 'site_imported':
+	$clean_import->process();
+	break;
+}
 
 // EOF
