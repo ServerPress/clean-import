@@ -1,6 +1,6 @@
 <?php
 
-class DS_Clean_Import_Aria_Engine extends DS_Clean_Import_Base
+class DS_Clean_Import_AriaEngine extends DS_Clean_Import_Base
 {
 	public function pre_import_process( $info )
 	{
@@ -22,9 +22,15 @@ DS_Clean_Import::debug(__METHOD__.'(): found ' . count($files) . ' files');
 		foreach ($files as $file) {
 DS_Clean_Import::debug(__METHOD__.'(): checking file: ' . $file);
 			if ( '.sql' === substr( $file, -4 ) ) {
-				$exec = $cmd . $params . ' ' . $workdir . $file . ' >' . $workdir . $file;
+				$workfile = $workdir . $file;
+copy($workfile, 'c:\\temp\\cidebug\\' . $file . '-ab');
+				$exec = $cmd . $params . ' ' . $workfile . ' >' . $workfile . '-out';
 DS_Clean_Import::debug(__METHOD__.'(): exec: ' . $exec);
-				exec( $exec );
+				$res = shell_exec( $exec );
+				rename( $workfile . '-out', $workfile );
+DS_Clean_Import::debug(__METHOD__.'(): res: ' . $res);
+copy($workfile, 'c:\\temp\\cidebug\\' . $file . '-aa');
+
 				++$count;
 			}
 		}

@@ -32,11 +32,15 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT', FALSE ) ) {
 			global $ds_runtime;
 self::debug(__METHOD__.'(): ui event=' . var_export($ds_runtime->last_ui_event, TRUE));
 
+			// first, any processors to move files into the expected place
 			$duplicator = $this->load_class( 'Duplicator' );
 			$duplicator->pre_import_process( $ds_runtime->last_ui_event->info );
 
-			$aria = $this->load_class( 'Aria_Engine' );
+			// second, any updates to the .sql files
+			$aria = $this->load_class( 'AriaEngine' );
 			$aria->pre_import_process( $ds_runtime->last_ui_event->info );
+			$logblock = $this->load_class( 'LogBlock' );
+			$logblock->pre_import_process( $ds_runtime->last_ui_event->info );
 		}
 
 		/**
