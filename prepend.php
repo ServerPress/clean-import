@@ -32,9 +32,11 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT', FALSE ) ) {
 			global $ds_runtime;
 self::debug(__METHOD__.'(): ui event=' . var_export($ds_runtime->last_ui_event, TRUE));
 
-			$this->load_class( 'Duplicator' );
-			$duplicator = new DS_Clean_Import_Duplicator();
+			$duplicator = $this->load_class( 'Duplicator' );
 			$duplicator->pre_import_process( $ds_runtime->last_ui_event->info );
+
+			$aria = $this->load_class( 'Aria_Engine' );
+			$aria->pre_import_process( $ds_runtime->last_ui_event->info );
 		}
 
 		/**
