@@ -35,9 +35,6 @@ $config_file->set_type( 'php-define' );
 $db_user = $config_file->get_key( 'DB_USER' );
 DS_Clean_Import::debug(__METHOD__.'(): db user: ' . $db_user );
 
-if ( empty( $prefix ) )
-	$prefix = 'ivac_';
-
 		if ( empty( $prefix ) ) {
 DS_Clean_Import::debug(__METHOD__.'(): unable to locate prefix');
 			return;						// abort if prefix cannot be established
