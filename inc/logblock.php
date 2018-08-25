@@ -2,6 +2,8 @@
 
 class DS_Clean_Import_LogBlock extends DS_Clean_Import_Base
 {
+	private $options = NULL;
+
 	private $tables = array(
 		'prli_clicks',					// Pretty Links clicke
 		'itsec_distributed_storage',	// iThemes Security log tables
@@ -18,6 +20,11 @@ class DS_Clean_Import_LogBlock extends DS_Clean_Import_Base
 	public function pre_import_process( $info )
 	{
 DS_Clean_Import::debug(__METHOD__.'():' . var_export($info, TRUE));
+		$this->load_options();
+		// if not configured to removed log records, exit
+		if ( '0' === $this->options['logrecords'] )
+			return;
+
 		$workdir = $info[2];
 
 		// get table prefix from config file
@@ -72,5 +79,16 @@ copy($workfile, 'c:\\temp\\cidebug\\' . $file . 'a');
 			}
 		}
 DS_Clean_Import::debug(__METHOD__.'(): modified ' . $count . ' files');
+	}
+
+	/**
+	 * Loads the options via the DS_Clean_Import_Options class
+	 */
+	private function load_options()
+	{
+		// TODO: move into base class
+		require_once( dirname( __FILE__ ) . '/options.php' );
+		$options = new DS_Clean_Import_Options();
+		$this->options = $options->get_options();
 	}
 }

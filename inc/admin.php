@@ -208,6 +208,20 @@ class DS_Clean_Import_Admin
 			)
 		);
 
+		add_settings_field(
+			'logrecords',
+			__( 'Do not import log records:', 'clean-import' ),
+			array( $this, 'render_radio_field' ),
+			self::SETTINGS_PAGE,
+			$section_id,
+			array(
+				'name' => 'logrecords',
+				'value' => $option_values->get( 'logrecords', '0' ),
+				'description' => __( 'If "Yes", Clean Import will not import log records from plugins such as Gravity Forms, iThemes, Pretty Links, Wordfence, etc.', 'clean-import' ),
+				'options' => $yes_no,
+			)
+		);
+
 		// load support classes
 		require_once( dirname( __FILE__ ) . '/base.php' );
 		require_once( dirname( __FILE__ ) . '/plugins.php' );

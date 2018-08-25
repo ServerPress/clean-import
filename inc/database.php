@@ -11,6 +11,8 @@ class DS_Clean_Import_Database extends DS_Clean_Import_Base
 	private $_prefix = NULL;
 	private $_dbc = NULL;
 
+	private $options = NULL;
+
 	/**
 	 * Perform cleanup on the database
 	 * @param string $db_user The database user name

@@ -160,6 +160,7 @@ require_once( dirname( __FILE__ ) . '/inc/plugins.php' );
 						ds_clean_import_radio( 'comments', 'Remove deleted Comments:', $settings['comments'], $yes_no, 'If "Yes", Clean Import will remove any deleted Comments and associated metadata.' );
 						ds_clean_import_radio( 'postmeta', 'Remove orphaned postmeta:', $settings['postmeta'], $yes_no, 'If "Yes", Clean Import will remove any postmeta records that do not have a corresponding record in the Posts table.' );
 						ds_clean_import_radio( 'usermeta', 'Remove orphaned usermeta:', $settings['usermeta'], $yes_no, 'If "Yes", Clean Import will remove any usermeta records that do not have a corresponding record in the Users table.' );
+						ds_clean_import_radio( 'logrecords', 'Do not import log records:', $settings['logrecords'], $yes_no, 'If "Yes", Clean Import will not import log records from plugins such as Gravity Forms, iThemes, Pretty Links, Wordfence, etc.' );
 
 						$plugins = new DS_Clean_Import_Plugins();
 						$optional = $plugins->get_optional_plugins();

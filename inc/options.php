@@ -51,6 +51,7 @@ class DS_Clean_Import_Options
 			'usermeta' => '0',
 			'revisions' => '0',
 			'comments' => '0',
+			'logrecords' => '0',
 			'disable_plugins' => array(
 			),
 		);
