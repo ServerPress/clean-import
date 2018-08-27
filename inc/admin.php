@@ -210,7 +210,7 @@ class DS_Clean_Import_Admin
 
 		add_settings_field(
 			'logrecords',
-			__( 'Do not import log records:', 'clean-import' ),
+			__( 'Skip importing log records:', 'clean-import' ),
 			array( $this, 'render_radio_field' ),
 			self::SETTINGS_PAGE,
 			$section_id,
@@ -310,37 +310,6 @@ class DS_Clean_Import_Admin
 		require_once( dirname( __FILE__ ) . '/options.php' );
 		$options = new DS_Clean_Import_Options();
 		$options->validate_and_save( $values );
-
-/*
-		foreach ( $values as $key => $value ) {
-			$valid = FALSE;
-			switch ( $key ) {
-			case 'disable_plugins':
-				// TODO: perform more detailed validation
-				$valid = TRUE;
-				break;
-
-			// these are the "Yes" / "No" options
-			case 'comments':
-			case 'postmeta':
-			case 'revisions':
-			case 'trashed':
-			case 'usermeta':
-				if ( '1' === $value || '0' === $value )
-					$valid = TRUE;
-				break;
-
-			case 'transients':
-				if ( in_array( $value, array( 'nothing', 'delete', 'update', 'expire' ) ) )
-					$valid = TRUE;
-				break;
-			}
-
-			if ( $valid )
-				$options->set( $key, $value );
-		}
-		$options->save();
-*/
 
 		// block the settings from being written to the database
 		add_filter( 'pre_update_option', array( $this, 'block_update_option' ), 10, 3 );

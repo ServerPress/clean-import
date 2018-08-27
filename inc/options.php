@@ -115,6 +115,7 @@ class DS_Clean_Import_Options
 			case 'revisions':
 			case 'trashed':
 			case 'usermeta':
+			case 'logrecords':
 				if ( '1' === $value || '0' === $value )
 					$valid = TRUE;
 				break;
