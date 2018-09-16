@@ -34,6 +34,10 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT', FALSE ) ) {
 			global $ds_runtime;
 self::debug(__METHOD__.'(): ui event=' . var_export($ds_runtime->last_ui_event, TRUE));
 
+			// ensure trailing directory separator for both platforms #34
+			if ( isset( $ds_runtime->last_ui_event->info[2] ) )
+				$ds_runtime->last_ui_event->info[2] = rtrim( $ds_runtime->last_ui_event->info[2], '\\/' ) . DIRECTORY_SEPARATOR;
+
 			// first, any processors to move files into the expected place
 			$duplicator = $this->load_class( 'Duplicator' );
 			$duplicator->pre_import_process( $ds_runtime->last_ui_event->info );
@@ -54,6 +58,11 @@ self::debug(__METHOD__.'(): ui event=' . var_export($ds_runtime->last_ui_event, 
 self::debug(__METHOD__.'() starting clean import process');
 
 			global $ds_runtime;
+
+			// ensure trailing directory separator for both platforms #34
+			if ( isset( $ds_runtime->last_ui_event->info[2] ) )
+				$ds_runtime->last_ui_event->info[2] = rtrim( $ds_runtime->last_ui_event->info[2], '\\/' ) . DIRECTORY_SEPARATOR;
+
 			$this->site_name = $siteName = $ds_runtime->last_ui_event->info[0];
 			$this->site_path = $this->trailingslashit( $ds_runtime->preferences->sites->{$siteName}->sitePath );
 
