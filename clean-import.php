@@ -4,7 +4,7 @@ Plugin Name: Clean Import
 Plugin URI: http://serverpress.com/plugins/clean-import
 Description: Resets .htaccess, clears cache, disables plugins and resets WordPress environment for local hosting with DesktopServer.
 Author: ServerPress Team
-Version: 1.1.5
+Version: 1.1.6
 Author URI: http://serverpress.com/
 Text Domain: clean-import
 */
