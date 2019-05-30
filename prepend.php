@@ -363,6 +363,7 @@ DS_Clean_Import::debug(__METHOD__.'() wrote ' . count( $newdata ) . ' lines to w
 		 */
 		public static function debug( $msg )
 		{
+return;
 			if ( self::DEBUG_LOG ) {
 				if ( NULL === self::$_log_file ) {
 					self::$_log_file = dirname( dirname( __FILE__ ) ) . '/~clean-import-log.txt';
