@@ -6,7 +6,7 @@
 if ( ! class_exists( 'DS_CLEAN_IMPORT', FALSE ) ) {
 	class DS_Clean_Import
 	{
-		const DEBUG_LOG = FALSE;						// set to TRUE to enable logging
+		const DEBUG_LOG = TRUE;						// set to TRUE to enable logging
 
 		public static $instance = NULL;
 
@@ -363,7 +363,7 @@ DS_Clean_Import::debug(__METHOD__.'() wrote ' . count( $newdata ) . ' lines to w
 		 */
 		public static function debug( $msg )
 		{
-return;
+//return;
 			if ( self::DEBUG_LOG ) {
 				if ( NULL === self::$_log_file ) {
 					self::$_log_file = dirname( dirname( __FILE__ ) ) . '/~clean-import-log.txt';

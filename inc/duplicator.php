@@ -33,6 +33,45 @@ DS_Clean_Import::debug(__METHOD__.'(): renamed ' . $workdir . $file);
 					break;
 				}
 			}
+
+			// scan for dup-installer/original_files_* directory
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' searching for "' . $workdir . 'dup-installer" directory');
+			if ( is_dir( $workdir . 'dup-installer' ) ) {
+				$scandir = $workdir . 'dup-installer' . DIRECTORY_SEPARATOR . 'original_files_*';
+				$files = scandir( $scandir );
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' searching for ' . $scandir . ' finds: ' . var_export($files, TRUE));
+				foreach ( $files as $file ) {
+					if ( is_dir( $file ) ) {
+						$found = FALSE;
+						// if it's a directory, look for specific files within it
+						$source = $file . DIRECTORY_SEPARATOR . 'source_site_wpconfig';
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' checking "' . $source . '"');
+						if ( file_exists( $source ) ) {
+							rename( $source, $workdir . 'wp-config.php' );
+							$found = TRUE;
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' renamed "' . $source . '" to "' . $workdir . 'wp-config.php"');
+						}
+
+						$source = $file . DIRECTORY_SEPARATOR . 'source_site_userini';
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' checking "' . $source . '"');
+						if ( file_exists( $source ) ) {
+							rename( $source, $workdir . 'user.ini' );
+							$found = TRUE;
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' renamed "' . $source . '" to "' . $workdir . 'user.ini"');
+						}
+
+						$source = $file . DIRECTORY_SEPARATOR . 'source_site_htaccess';
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' checking "' . $source . '"');
+						if ( file_exists( $source ) ) {
+							rename( $source, $workdir . '.htaccess' );
+							$found = TRUE;
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' renamed "' . $source . '" to "' . $workdir . '.htaccess"');
+						}
+						if ( $found)
+							break;				// if something was found, copied - can exit the loop
+					}
+				}
+			}
 		}
 
 DS_Clean_Import::debug(__METHOD__.'(): checking database.sql');
