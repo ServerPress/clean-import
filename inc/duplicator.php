@@ -55,7 +55,7 @@ DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' searching for ' . $scandi
 						}
 					}
 				}
-				if ( NULL !== $original_files )
+				if ( NULL !== $original_files ) {
 					$files = scandir( $original_files );
 					if ( FALSE === $files ) {
 DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' no files found in "' . $original_files . '"');
