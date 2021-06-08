@@ -42,42 +42,57 @@ DS_Clean_Import::debug(__METHOD__.'(): renamed ' . $workdir . $file);
 			// scan for dup-installer/original_files_* directory
 DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' searching for "' . $dup_installer . '" directory');
 			if ( is_dir( $dup_installer ) ) {
-				$scandir = $dup_installer . DIRECTORY_SEPARATOR . 'original_files_*';
+				$original_files = NULL;
+				$scandir = $dup_installer . DIRECTORY_SEPARATOR;
 				$files = scandir( $scandir );
 DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' searching for ' . $scandir . ' finds: ' . var_export($files, TRUE));
 				if ( FALSE !== $files ) {
 					foreach ( $files as $file ) {
-						if ( is_dir( $file ) ) {
-							$found = FALSE;
-							// if it's a directory, look for specific files within it
-							$source = $dup_installer . DIRECTORY_SEPARATOR . $file . DIRECTORY_SEPARATOR . 'source_site_wpconfig';
-DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' checking "' . $source . '"');
-							if ( file_exists( $source ) ) {
-								rename( $source, $workdir . 'wp-config.php' );
-								$found = TRUE;
-DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' renamed "' . $source . '" to "' . $workdir . 'wp-config.php"');
-							}
-
-							$source = $dup_installer . DIRECTORY_SEPARATOR . $file . DIRECTORY_SEPARATOR . 'source_site_userini';
-DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' checking "' . $source . '"');
-							if ( file_exists( $source ) ) {
-								rename( $source, $workdir . '.user.ini' );
-								$found = TRUE;
-DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' renamed "' . $source . '" to "' . $workdir . 'user.ini"');
-							}
-
-							$source = $dup_installer . DIRECTORY_SEPARATOR . $file . DIRECTORY_SEPARATOR . 'source_site_htaccess';
-DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' checking "' . $source . '"');
-							if ( file_exists( $source ) ) {
-								rename( $source, $workdir . '.htaccess' );
-								$found = TRUE;
-DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' renamed "' . $source . '" to "' . $workdir . '.htaccess"');
-							}
-							if ( $found )
-								break;				// if something was found, copied - can exit the loop
+						if ( is_dir( $scandir . $file ) &&
+							'original_files_' === substr( $file, 0, 15 ) && strlen( $file ) > 10 ) {
+							$original_files = $scandir . $file . DIRECTORY_SEPARATOR;
+							break;
 						}
-					} // foreach
-				} // FALSE !== $files
+					}
+				}
+				if ( NULL !== $original_files )
+					$files = scandir( $original_files );
+					if ( FALSE === $files ) {
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' no files found in "' . $original_files . '"');
+					} else {
+						foreach ( $files as $file ) {
+							if ( is_dir( $file ) ) {
+								$found = FALSE;
+								// if it's a directory, look for specific files within it
+								$source = $original_files . $file . DIRECTORY_SEPARATOR . 'source_site_wpconfig';
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' checking "' . $source . '"');
+								if ( file_exists( $source ) ) {
+									rename( $source, $workdir . 'wp-config.php' );
+									$found = TRUE;
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' renamed "' . $source . '" to "' . $workdir . 'wp-config.php"');
+								}
+
+								$source = $original_files . $file . DIRECTORY_SEPARATOR . 'source_site_userini';
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' checking "' . $source . '"');
+								if ( file_exists( $source ) ) {
+									rename( $source, $workdir . '.user.ini' );
+									$found = TRUE;
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' renamed "' . $source . '" to "' . $workdir . 'user.ini"');
+								}
+
+								$source = $original_files . $file . DIRECTORY_SEPARATOR . 'source_site_htaccess';
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' checking "' . $source . '"');
+								if ( file_exists( $source ) ) {
+									rename( $source, $workdir . '.htaccess' );
+									$found = TRUE;
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' renamed "' . $source . '" to "' . $workdir . '.htaccess"');
+								}
+								if ( $found )
+									break;				// if something was found, copied - can exit the loop
+							}
+						} // foreach
+					} // FALSE !== $files
+				} // NULL !== $original_files
 
 				// look for database.sql file
 DS_Clean_Import::debug(__METHOD__.'(): checking for database.sql');
