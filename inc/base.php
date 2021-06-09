@@ -39,13 +39,13 @@ class DS_Clean_Import_Base
 	 */
 	public function rename_files( $file_list )
 	{
-DS_Clean_Import::debug(__METHOD__.'() has ' . count($file_list) . ' files to rename:');
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' has ' . count($file_list) . ' files to rename:');
 		foreach	( $file_list as $file_to_rename ) {
 			if ( file_exists( $file_to_rename ) ) {
-DS_Clean_Import::debug(__METHOD__.'() renaming "' . $file_to_rename . '" to "' . $file_to_rename . $this->backup_ext . '"');
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' renaming "' . $file_to_rename . '" to "' . $file_to_rename . $this->backup_ext . '"');
 				rename( $file_to_rename, $file_to_rename . $this->backup_ext );
 			} else {
-DS_Clean_Import::debug(__METHOD__.'() file "' . $file_to_rename . '" not found');
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' file "' . $file_to_rename . '" not found');
 			}
 		}
 	}

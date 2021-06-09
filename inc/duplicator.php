@@ -89,7 +89,7 @@ DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' renamed "' . $source . '"
 								}
 								if ( $found )
 									break;				// if something was found, copied - can exit the loop
-							}
+							} // is_dir
 						} // foreach
 					} // FALSE !== $files
 				} // NULL !== $original_files
@@ -104,7 +104,7 @@ DS_Clean_Import::debug(__METHOD__.'(): found ' . count($files) . ' files');
 	
 					foreach ( $files as $file ) {
 DS_Clean_Import::debug(__METHOD__.'(): checking file: ' . $file);
-						if ( 'dup-database__' == substr( $file, 0, 14 ) && '.sql' === substr( $file, -4 ) ) {
+						if ( 'dup-database__' === substr( $file, 0, 14 ) && '.sql' === substr( $file, -4 ) ) {
 							$sql_file = $dup_installer . DIRECTORY_SEPARATOR . $file;
 							rename( $sql_file, $workdir . 'database.sql' );
 DS_Clean_Import::debug(__METHOD__.'(): renamed ' . $sql_file);

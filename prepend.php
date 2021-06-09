@@ -55,7 +55,7 @@ self::debug(__METHOD__.'(): ui event=' . var_export($ds_runtime->last_ui_event, 
 		public function process()
 		{
 			$this->backup_ext = '-sav-' . time();
-self::debug(__METHOD__.'() starting clean import process');
+self::debug(__METHOD__.'(): starting clean import process');
 
 			global $ds_runtime;
 
@@ -64,13 +64,14 @@ self::debug(__METHOD__.'() starting clean import process');
 				$ds_runtime->last_ui_event->info[2] = rtrim( $ds_runtime->last_ui_event->info[2], '\\/' ) . DIRECTORY_SEPARATOR;
 
 			$this->site_name = $siteName = $ds_runtime->last_ui_event->info[0];
+self::debug(__METHOD__.'():' . __LINE__ . ' site name=' . $this->site_name);
 			$this->site_path = $this->trailingslashit( $ds_runtime->preferences->sites->{$siteName}->sitePath );
+self::debug(__METHOD__.'():' . __LINE__ . ' path=' . $this->site_path);
 
 			// find the directory that WordPress is in
 			$wpconfig_path = DS_Utils::find_first_file( $this->site_path, 'wp-config.php' );
 			$this->install_path = $this->trailingslashit( substr( $wpconfig_path, 0, -13 ) );
-self::debug(__METHOD__.'() site_path=' . $this->site_path);
-self::debug(__METHOD__.'() install_path=' . $this->install_path);
+self::debug(__METHOD__.'():' . __LINE__ . ' install_path=' . $this->install_path);
 
 			// get location of config file
 			$wpconfig = $this->install_path . 'wp-config.php';
@@ -78,7 +79,7 @@ self::debug(__METHOD__.'() install_path=' . $this->install_path);
 			// load all plugin-specific directories into a single array
 			$jetpack_dir = $this->install_path . 'wp-content/plugins/jetpack';
 
-self::debug(__METHOD__.'() backup wp-config');
+self::debug(__METHOD__.'():' . __LINE__ . ' backup wp-config');
 			// backup the wp-config file
 			if ( file_exists( $wpconfig ) ) {
 				copy( $wpconfig, $wpconfig . $this->backup_ext );
@@ -86,6 +87,7 @@ self::debug(__METHOD__.'() backup wp-config');
 
 			// collect wp-config data
 			$this->config_file = $wp_normal_config_file = new DS_ConfigFile( $wpconfig );
+self::debug(__METHOD__.'():' . __LINE__ . ' config_file=' . $wpconfig );
 
 			$db_user = $wp_normal_config_file->get_key( 'DB_USER' );
 			$db_password = $wp_normal_config_file->get_key( 'DB_PASSWORD' );
@@ -95,10 +97,10 @@ self::debug(__METHOD__.'() backup wp-config');
 
 			$wp_home = $wp_normal_config_file->get_key( 'WP_HOME' );
 			$wp_siteurl = $wp_normal_config_file->get_key( 'WP_SITEURL' );
-self::debug(__METHOD__.'() dbuser=' . $db_user . '  db_pass=' . $db_password . '  prefix=' . $table_prefix . '  home=' . $wp_home);
+self::debug(__METHOD__.'()' . __LINE__ . ' dbuser=' . $db_user . '  db_pass=' . $db_password . '  prefix=' . $table_prefix . '  home=' . $wp_home);
 
 
-self::debug(__METHOD__.'() setting DB configurations');
+self::debug(__METHOD__.'()' . __LINE__ . ' setting DB configurations');
 			// set the configuration info in the new wp-config
 			$source = dirname( __FILE__ ) . '/lib/wp-config-sample.php';
 			$this->new_config = $clean_config_file = new DS_ConfigFile( $source );
@@ -107,7 +109,7 @@ self::debug(__METHOD__.'() setting DB configurations');
 			$clean_config_file->set_key( 'DB_PASSWORD', $db_password );
 			$clean_config_file->set_key( 'DB_HOST', '127.0.0.1' );
 
-self::debug(__METHOD__.'() setting salts');
+self::debug(__METHOD__.'()' . __LINE__ . ' setting salts');
 			// set the salts
 			$clean_config_file->set_key( 'AUTH_KEY', DS_Utils::random_salt() );
 			$clean_config_file->set_key( 'SECURE_AUTH_KEY', DS_Utils::random_salt() );
@@ -125,23 +127,23 @@ self::debug(__METHOD__.'() setting salts');
 				$multisite->clean_import();
 			}
 
-			$clean_config_file->isolate_block('The name of the database for WordPress', '/**#@-*/' );
+			$clean_config_file->isolate_block( 'The name of the database for WordPress', '/**#@-*/' );
 
 			// JetPack
 			if ( file_exists ( $jetpack_dir ) ) {
-self::debug(__METHOD__.'() JetPack detected - setting DEV mode');
-				$this->new_config->isolate_block('/**#@-*/', '/* That\'s all, stop editing! Happy blogging. */' );
+self::debug(__METHOD__.'()' . __LINE__ . ' JetPack detected - setting DEV mode');
+				$this->new_config->isolate_block( '/**#@-*/', '/* That\'s all, stop editing! Happy blogging. */' );
 				$clean_config_file->set_key( 'JETPACK_DEV_DEBUG', 'TRUE' );
 			}
 
 			// remove block isolation
 			$clean_config_file->isolate_block( NULL, NULL );
 
-self::debug(__METHOD__.'() setting table prefix');
+self::debug(__METHOD__.'()' . __LINE__ . ' setting table prefix');
 			$clean_config_file->set_type( 'php-variable' );
 			$clean_config_file->set_key( 'table_prefix', $table_prefix );
 
-self::debug(__METHOD__.'() saving new config file');
+self::debug(__METHOD__.'()' . __LINE__ . ' saving new config file');
 			// save the new wp-config file
 			// TODO: move this after plugin-specific updates??
 			$clean_config_file->save( $wpconfig );
@@ -155,7 +157,7 @@ self::debug(__METHOD__.'() saving new config file');
 				'FLYWHEEL_PLUGIN_DIR',
 			);
 			if ( $this->has_constant( $flywheel_constants ) ) {
-DS_Clean_Import::debug(__METHOD__.'() found presence of Flywheel host platform - removing references');
+DS_Clean_Import::debug(__METHOD__.'()' . __LINE__ . ' found presence of Flywheel host platform - removing references');
 				require dirname( __FILE__ ) . '/inc/flywheel.php';		
 				$flywheel = new DS_Clean_Import_Flywheel();
 				$flywheel->clean_import();
@@ -168,7 +170,7 @@ DS_Clean_Import::debug(__METHOD__.'() found presence of Flywheel host platform -
 				'WPE_CLUSTER_ID',
 			);
 			if ( $this->has_constant( $wpengine_constants ) ) {
-DS_Clean_Import::debug(__METHOD__.'() found presence of WPEngine host platform - removing references');
+DS_Clean_Import::debug(__METHOD__.'()' . __LINE__ . ' found presence of WPEngine host platform - removing references');
 				$wpengine = $this->load_class( 'WPEngine' );
 				$wpengine->clean_import();
 			}
@@ -180,7 +182,7 @@ DS_Clean_Import::debug(__METHOD__.'() found presence of WPEngine host platform -
 			// completed host-specific changes
 
 			// do final processing
-self::debug(__METHOD__.'() final processing');
+self::debug(__METHOD__.'()' . __LINE__ . ' final processing');
 			$this->htaccess();						// process the htaccess file
 
 			$this->rename_plugin_files();			// rename / disable plugins
@@ -189,13 +191,13 @@ self::debug(__METHOD__.'() final processing');
 
 			$this->comment_cache_settings();		// remove / disable cache settings
 
-self::debug(__METHOD__.'() running database cleanup...');
+self::debug(__METHOD__.'()' . __LINE__ . ' running database cleanup...');
 			$database = $this->load_class( 'Database' );
 			$database->clean_import( $db_user, $db_password, $table_prefix );
 
 			// TODO: remove known plugins from the 'installed_plugin' options entry
 			// TODO: resave permalink settings / flush rewrite rules
-self::debug(__METHOD__.'() clean import processing complete');
+self::debug(__METHOD__.'()' . __LINE__ . ' clean import processing complete');
 			$this->close_log();
 		}
 
@@ -247,12 +249,12 @@ DS_Clean_Import::debug(__METHOD__."('{$class}')");
 		 */
 		private function htaccess()
 		{
-DS_Clean_Import::debug(__METHOD__.'() rebuiling .htaccess file');
+DS_Clean_Import::debug(__METHOD__.'()' . __LINE__ . ' rebuiling .htaccess file');
 			$htaccess = $this->install_path . '.htaccess';
-
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' htaccess=' . $htaccess);
 			// see if .htaccess exists, if does rename
 			if ( file_exists( $htaccess ) ) {
-DS_Clean_Import::debug(__METHOD__.'() saving original .htaccess file');
+DS_Clean_Import::debug(__METHOD__.'()' . __LINE__ . ' saving original .htaccess file');
 				rename( $htaccess, $htaccess . $this->backup_ext );
 			}
 
@@ -269,7 +271,7 @@ DS_Clean_Import::debug(__METHOD__.'() saving original .htaccess file');
 			$contents .= "</IfModule>\n";
 			$contents .= "# END WordPress\n"; 
 
-DS_Clean_Import::debug(__METHOD__.'() recreating .htaccess contents');
+DS_Clean_Import::debug(__METHOD__.'()' . __LINE__ . ' recreating .htaccess contents');
 			file_put_contents( $htaccess, $contents );
 		}
 
@@ -278,7 +280,7 @@ DS_Clean_Import::debug(__METHOD__.'() recreating .htaccess contents');
 		 */
 		private function rename_plugin_files()
 		{
-DS_Clean_Import::debug(__METHOD__.'() renaming plugins that can interfere with local hosting');
+DS_Clean_Import::debug(__METHOD__.'()' . __LINE__ . ' renaming plugins that can interfere with local hosting');
 			$plugins = $this->load_class( 'Plugins' );
 			$plugins->clean_import();
 		}
@@ -288,15 +290,16 @@ DS_Clean_Import::debug(__METHOD__.'() renaming plugins that can interfere with l
 		 */
 		private function remove_cache_dirs()
 		{
-DS_Clean_Import::debug(__METHOD__.'() check for any cache directories');
+DS_Clean_Import::debug(__METHOD__.'()' . __LINE__ . ' check for any cache directories');
 			$directories = array(
 				$this->install_path . 'wp-content/cache',
 			);
 
 			// see if any cache folders exist. if so delete them
 			foreach ( $directories as $dir ) {
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' dir=' . $dir);
 				if ( is_dir( $dir ) ) {
-DS_Clean_Import::debug(__METHOD__.'() found directory "' . $dir . '" - removing');
+DS_Clean_Import::debug(__METHOD__.'()' . __LINE__ . ' found directory "' . $dir . '" - removing');
 					$this->unlink_recursive( $dir, TRUE );
 				}
 			}
@@ -307,7 +310,7 @@ DS_Clean_Import::debug(__METHOD__.'() found directory "' . $dir . '" - removing'
 		 */
 		private function comment_cache_settings()
 		{
-DS_Clean_Import::debug(__METHOD__.'() remove any caching settings from wp-config');
+DS_Clean_Import::debug(__METHOD__.'()' . __LINE__ . ' remove any caching settings from wp-config');
 			$wpconfig = $this->install_path . 'wp-config.php';
 
  			/**
@@ -327,7 +330,7 @@ DS_Clean_Import::debug(__METHOD__.'() remove any caching settings from wp-config
 //				$newdata[] = $filerow;
 //			}
 			file_put_contents( $wpconfig, $newdata );
-DS_Clean_Import::debug(__METHOD__.'() wrote ' . count( $newdata ) . ' lines to wp-config');
+DS_Clean_Import::debug(__METHOD__.'()' . __LINE__ . ' wrote ' . count( $newdata ) . ' lines to wp-config');
 		}
 
 		/**
@@ -337,7 +340,7 @@ DS_Clean_Import::debug(__METHOD__.'() wrote ' . count( $newdata ) . ' lines to w
 		 */
 		private function has_constant( $constants )
 		{
-			foreach ($constants as $constant ) {
+			foreach ( $constants as $constant ) {
 				$config_value = $this->config_file->get_key( $constant );
 				if ( ! empty( $config_value ) ) {
 					return TRUE;
@@ -353,7 +356,7 @@ DS_Clean_Import::debug(__METHOD__.'() wrote ' . count( $newdata ) . ' lines to w
 		 */
 		private function trailingslashit( $val )
 		{
-			$val = rtrim( $val, '/\\') . '/';
+			$val = rtrim( $val, '/\\' ) . '/';
 			return $val;
 		}
 
