@@ -26,25 +26,25 @@
 		$stop_long_comments_script
 	);
 
-		foreach	( $files_to_rename as $file_to_rename ) {
-			if ( file_exists( $file_to_rename ) ) {
-				rename( $file_to_rename, $file_to_rename . '-sav-' . time() );
-			}
-		} 
+	foreach	( $files_to_rename as $file_to_rename ) {
+		if ( file_exists( $file_to_rename ) ) {
+			rename( $file_to_rename, $file_to_rename . '-sav-' . time() );
+		}
+	} 
 */
 
 		// Move and rename database
 /*
-		trace('Start!');
+		trace( 'Start!' );
 		$database = $sitePath . '/wp-content/mysql.sql';
-		trace($database);
+		trace( $database );
 		$new_database = $sitePath . '/database.sql';
-		trace($new_databas);
+		trace( $new_databas );
 		if ( file_exists ( $database ) ) {
-			rename($database,$new_database);
-			trace('rename mysql.sql to database.sql');
-			unlink($database);
-			trace('Delete mysql.sql');
+			rename( $database,$new_database );
+			trace( 'rename mysql.sql to database.sql' );
+			unlink( $database );
+			trace( 'Delete mysql.sql' );
 		}
 */
 
@@ -70,6 +70,6 @@ DS_Clean_Import::debug(__METHOD__.'()');
 			$mu_path . 'wpengine-hide.php',
 		);
 
-		$this->rename_files($files_to_rename);
+		$this->rename_files( $files_to_rename );
 	}
 }

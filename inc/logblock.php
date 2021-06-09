@@ -52,10 +52,10 @@ DS_Clean_Import::debug(__METHOD__.'(): unable to locate prefix');
 		else
 			$cmd = 'C:\\xampplite\\ds-plugins\\ds-cli\\platform\\win32\\cygwin\\bin\\sed.exe ';
 		$change_list = array();
-		foreach ($this->tables as $table) {
+		foreach ( $this->tables as $table ) {
 			$change_list[] = 's/INSERT INTO \x60' . $prefix . $table . '\x60/-- INSERT INTO \x60' . $prefix . $table . '\x60/g';
 		}
-		$params = '"' . implode(';', $change_list) . '"';
+		$params = '"' . implode( ';', $change_list ) . '"';
 
 DS_Clean_Import::debug(__METHOD__.'():' . $cmd . $params);
 
@@ -63,7 +63,7 @@ DS_Clean_Import::debug(__METHOD__.'():' . $cmd . $params);
 		$files = scandir( $workdir );
 		$count = 0;
 DS_Clean_Import::debug(__METHOD__.'(): found ' . count($files) . ' files');
-		foreach ($files as $file) {
+		foreach ( $files as $file ) {
 DS_Clean_Import::debug(__METHOD__.'(): checking file: ' . $file);
 			if ( '.sql' === substr( $file, -4 ) ) {
 				$workfile = $workdir . $file;

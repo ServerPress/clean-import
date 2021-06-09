@@ -19,7 +19,7 @@ DS_Clean_Import::debug(__METHOD__.'()');
 
 		// write values to new config file
 self::debug(__METHOD__.'() multisite- rewriting constants');
-		$this->new_config->isolate_block('/**#@-*/', '/* That\'s all, stop editing! Happy blogging. */' );
+		$this->new_config->isolate_block( '/**#@-*/', '/* That\'s all, stop editing! Happy blogging. */' );
 
 		$this->new_config->set_key( 'WP_ALLOW_MULTISITE', $wp_allow_multisite );
 		$this->new_config->set_key( 'MULTISITE', 'TRUE' );

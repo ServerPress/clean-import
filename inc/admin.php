@@ -58,13 +58,13 @@ class DS_Clean_Import_Admin
 			return;
 
 		$screen->set_help_sidebar(
-			'<p><string>' . __('For more information:', 'clean-import' ) . '</strong></p>' .
+			'<p><string>' . __( 'For more information:', 'clean-import' ) . '</strong></p>' .
 			'<p>' . sprintf( '<a href="%2$s" target="_blank">%1$s</a>%3$s<a href="%5$s" target="_blank">%4$s</a>.',
-				__( 'See our documentation here: ', 'clean-import'),
+				__( 'See our documentation here: ', 'clean-import' ),
 				'https://serverpress.com/clean-import',
-				__( ', or visit our ', 'clean-import'),
+				__( ', or visit our ', 'clean-import' ),
 				__( 'GitHub Repository', 'clean-import' ),
-				'https://github.com/ServerPress/clean-import') . '</p>'
+				'https://github.com/ServerPress/clean-import' ) . '</p>'
 		);
 
 		$screen->add_help_tab( array(
@@ -74,7 +74,7 @@ class DS_Clean_Import_Admin
 				'<p><b>' . __( 'Perform Transient Cleanup Options:', 'clean-import') . '</b></p>' .
 				'<p><ul><li><b>' . __( 'Do nothing with Transients', 'clean-import' ) . '</b> - '.
 					__( 'Clean Import will not remove or update any Transient data in the imported site.', 'clean-import' ) . '</li>' .
-					'<li><b>' . __( 'Delete all Transient data', 'clean-import') . '</b> - ' .
+					'<li><b>' . __( 'Delete all Transient data', 'clean-import' ) . '</b> - ' .
 					__( 'Clean Import will remove all Transient data in the Imported site, whether it is expired or not.', 'clean-import' ) . '</li>' .
 					'<li><b>' . __( 'Update Transient expiration', 'clean-import' ) . '</b> - ' .
 					__( 'Clean Import will update the expiration time of all Transients, setting it to 24 hours after the time of Import.', 'clean-import' ) . '</li>' .
@@ -347,7 +347,7 @@ class DS_Clean_Import_Admin
 
 		foreach ( $options as $value => $label ) {
 			// clean_import_settings
-			printf('<input type="radio" name="%s[%s]" value="%s" %s /> %s<br/>',
+			printf( '<input type="radio" name="%s[%s]" value="%s" %s /> %s<br/>',
 				self::OPTION_NAME, $name, $value, checked( $value, $args['value'], FALSE ), $label );
 		}
 		if ( isset( $args['description'] ) )
@@ -367,13 +367,13 @@ class DS_Clean_Import_Admin
 
 		foreach ( $options as $key => $value ) {
 			if ( ! $disabled )
-				printf('<input type="hidden" name="%s[%s][%s]" value="0" />',
+				printf( '<input type="hidden" name="%s[%s][%s]" value="0" />',
 					self::OPTION_NAME, $name, $key );
 			if ( $disabled )
-				printf('<input type="checkbox" name="%s[%s][%s]" value="0" checked="checked" disabled="disabled" /> %s<br/>',
+				printf( '<input type="checkbox" name="%s[%s][%s]" value="0" checked="checked" disabled="disabled" /> %s<br/>',
 					self::OPTION_NAME, $name, $key, $key );
 			else
-				printf('<input type="checkbox" name="%s[%s][%s]" value="1" %s /> %s<br/>',
+				printf( '<input type="checkbox" name="%s[%s][%s]" value="1" %s /> %s<br/>',
 					self::OPTION_NAME, $name, $key, checked( $value, isset( $defaults[$key] ) ? $defaults[$key] : $value, FALSE ), $key );
 		}
 		if ( isset( $args['description'] ) )

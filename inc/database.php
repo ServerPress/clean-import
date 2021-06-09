@@ -100,7 +100,7 @@ DS_Clean_Import::debug(__METHOD__ . "('{$type}')");
 		foreach ( $tables as $table ) {
 			$sql = "SELECT COUNT(*) FROM `{$table}`";
 			$res = $this->_dbc->get_col( $sql );
-			$count = empty($res) ? 0 : $res[0];
+			$count = empty( $res ) ? 0 : $res[0];
 DS_Clean_Import::debug(" - there are {$count} records in the `{$table}` table");
 		}
 	}

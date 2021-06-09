@@ -14,7 +14,7 @@
 <script src="http://localhost/js/jquery.tablesorter.js"></script>
 <script>
 	(function($){
-		$(function(){
+		$(function() {
 //			$('.detail').css({height:( $(window).height() -308)});
 			console.log('removing...');
 //			$('footer').remove();
@@ -23,14 +23,14 @@
 	})(jQuery);
 	function contextual_help_button()
 	{
-		var text = $('#contextual-help-button').text();
+		var text = $( '#contextual-help-button' ).text();
 console.log('contextual_help_button() clicked - ' + text);
 		if ( 'Help v' === text ) {
-			$('#contextual-help-button').text('Help ^');
-			$('#contextual-help').show();
+			$( '#contextual-help-button' ).text( 'Help ^' );
+			$( '#contextual-help' ).show();
 		} else {
-			$('#contextual-help-button').text('Help v');
-			$('#contextual-help').hide();
+			$( '#contextual-help-button' ).text( 'Help v' );
+			$( '#contextual-help' ).hide();
 		}
 	}
 </script>

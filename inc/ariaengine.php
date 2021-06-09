@@ -18,8 +18,8 @@ DS_Clean_Import::debug(__METHOD__.'():' . $cmd . $params);
 		// scan for .sql files to be updated
 		$files = scandir( $workdir );
 		$count = 0;
-DS_Clean_Import::debug(__METHOD__.'(): found ' . count($files) . ' files');
-		foreach ($files as $file) {
+DS_Clean_Import::debug(__METHOD__.'(): found ' . count( $files ) . ' files');
+		foreach ( $files as $file ) {
 DS_Clean_Import::debug(__METHOD__.'(): checking file: ' . $file);
 			if ( '.sql' === substr( $file, -4 ) ) {
 				$workfile = $workdir . $file;

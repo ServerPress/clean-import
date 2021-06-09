@@ -40,7 +40,7 @@ function ds_clean_import_radio( $name, $title, $value, $options, $description )
 	echo	'<td>', $title, '</td>';
 	echo	'<td>';
 	foreach ( $options as $key => $desc ) {
-		echo '<input type="radio" name="clean-import[', $name, ']" value="', $key, '" ', ( $value == $key ? ' checked="checked" ' : ''), ' /> ', $desc, '<br/>';
+		echo '<input type="radio" name="clean-import[', $name, ']" value="', $key, '" ', ( $value == $key ? ' checked="checked" ' : '' ), ' /> ', $desc, '<br/>';
 	}
 	echo		'<p>', $description, '</p>';
 	echo	'</td>';
@@ -55,13 +55,13 @@ function ds_clean_import_checkbox( $name, $title, $values, $options, $descriptio
 //echo var_export($values, TRUE), '<br/>';
 	foreach ( $options as $key => $value ) {
 		if ( ! $disabled )
-			printf('<input type="hidden" name="clean-import[%s][%s]" value="0" />',
+			printf( '<input type="hidden" name="clean-import[%s][%s]" value="0" />',
 				$name, $key );
 		if ( $disabled )
-			printf('<input type="checkbox" name="clean-import[%s][%s]" value="0" checked="checked" disabled="disabled" /> %s<br/>',
+			printf( '<input type="checkbox" name="clean-import[%s][%s]" value="0" checked="checked" disabled="disabled" /> %s<br/>',
 				$name, $key, $key );
 		else
-			printf('<input type="checkbox" name="clean-import[%s][%s]" value="1" %s /> %s<br/>',
+			printf( '<input type="checkbox" name="clean-import[%s][%s]" value="1" %s /> %s<br/>',
 				$name, $key, ( ! isset( $values[$key] ) || $value === $values[$key] ? ' checked="checked" ' : '' ), $key );
 	}
 	echo '<em>', $description, '</em>';
