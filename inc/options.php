@@ -15,7 +15,7 @@ class DS_Clean_Import_Options
 	public function __construct()
 	{
 		// puts the file in the DesktopServer/ds-plugins/clean-import/ directory.
-		$this->_file = dirname( dirname( __FILE__ ) ) . '/' . self::FILE_NAME;
+		$this->_file = dirname( __DIR__ ) . '/' . self::FILE_NAME;
 
 		$this->_load_options();
 	}
