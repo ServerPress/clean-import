@@ -19,7 +19,7 @@ DS_Clean_Import::debug(__METHOD__.'(): wp-config.php not present');
 			$files = scandir( $workdir );
 DS_Clean_Import::debug(__METHOD__.'(): found ' . count($files) . ' files');
 			foreach ( $files as $file ) {
-DS_Clean_Import::debug(__METHOD__.'(): checking file: ' . $file);
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' checking file: ' . $workdir . $file);
 				if ( 'wp-config-arc.txt' === $file ) {
 					rename( $workdir . 'wp-config-arc.txt', $workdir . 'wp-config.php' );
 DS_Clean_Import::debug(__METHOD__.'(): renamed ' . $workdir . $file);
@@ -29,7 +29,7 @@ DS_Clean_Import::debug(__METHOD__.'(): renamed ' . $workdir . $file);
 					$guid = substr( $file, 19 );
 					$guid = substr( $guid, 0, strlen( $guid ) - 4 );
 					rename( $workdir . $file, $workdir . 'wp-config.php' );
-DS_Clean_Import::debug(__METHOD__.'(): renamed ' . $workdir . $file);
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' renamed ' . $workdir . $file . ' to ' . $workdir . 'wp-config.php');
 					break;
 				}
 			}
@@ -55,37 +55,43 @@ DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' searching for ' . $scandi
 						}
 					}
 				}
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' original_files=' . $original_files);
 				if ( NULL !== $original_files ) {
 					$files = scandir( $original_files );
 					if ( FALSE === $files ) {
 DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' no files found in "' . $original_files . '"');
 					} else {
 						foreach ( $files as $file ) {
-							if ( is_dir( $file ) ) {
+							if ( '.' === $file || '..' === $file )
+								continue;
+							if ( is_dir( $original_files . $file ) ) {
 								$found = FALSE;
 								// if it's a directory, look for specific files within it
 								$source = $original_files . $file . DIRECTORY_SEPARATOR . 'source_site_wpconfig';
 DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' checking "' . $source . '"');
 								if ( file_exists( $source ) ) {
-									rename( $source, $workdir . 'wp-config.php' );
+									copy( $source, $workdir . 'wp-config.php' );
 									$found = TRUE;
-DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' renamed "' . $source . '" to "' . $workdir . 'wp-config.php"');
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' copied "' . $source . '" to "' . $workdir . 'wp-config.php"');
+if ( ! file_exists( $workdir . 'wp-config.php' ) ) DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' copy failed');
 								}
 
 								$source = $original_files . $file . DIRECTORY_SEPARATOR . 'source_site_userini';
 DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' checking "' . $source . '"');
 								if ( file_exists( $source ) ) {
-									rename( $source, $workdir . '.user.ini' );
+									copy( $source, $workdir . '.user.ini' );
 									$found = TRUE;
-DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' renamed "' . $source . '" to "' . $workdir . 'user.ini"');
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' copied "' . $source . '" to "' . $workdir . 'user.ini"');
+if ( ! file_exists( $workdir . 'user.ini' ) ) DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' copy failed');
 								}
 
 								$source = $original_files . $file . DIRECTORY_SEPARATOR . 'source_site_htaccess';
 DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' checking "' . $source . '"');
 								if ( file_exists( $source ) ) {
-									rename( $source, $workdir . '.htaccess' );
+									copy( $source, $workdir . '.htaccess' );
 									$found = TRUE;
-DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' renamed "' . $source . '" to "' . $workdir . '.htaccess"');
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' copied "' . $source . '" to "' . $workdir . '.htaccess"');
+if ( ! file_exists( $workdir . '.htaccess' ) ) DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' copy failed');
 								}
 								if ( $found )
 									break;				// if something was found, copied - can exit the loop
@@ -107,7 +113,7 @@ DS_Clean_Import::debug(__METHOD__.'(): checking file: ' . $file);
 						if ( 'dup-database__' === substr( $file, 0, 14 ) && '.sql' === substr( $file, -4 ) ) {
 							$sql_file = $dup_installer . DIRECTORY_SEPARATOR . $file;
 							rename( $sql_file, $workdir . 'database.sql' );
-DS_Clean_Import::debug(__METHOD__.'(): renamed ' . $sql_file);
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' renamed ' . $sql_file . ' to ' . $workdir . 'database.sql');
 							break;
 						}
 					}

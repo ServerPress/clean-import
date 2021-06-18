@@ -47,6 +47,10 @@ self::debug(__METHOD__.'(): ui event=' . var_export($ds_runtime->last_ui_event, 
 			$aria->pre_import_process( $ds_runtime->last_ui_event->info );
 			$logblock = $this->load_class( 'LogBlock' );
 			$logblock->pre_import_process( $ds_runtime->last_ui_event->info );
+
+			$dir = $ds_runtime->last_ui_event->info[2] . DIRECTORY_SEPARATOR;
+			$files = scandir( $dir );
+self::debug(__METHOD__.'():' . __LINE__ . ' files in "' . $dir . '": ' . var_export($files, TRUE));
 		}
 
 		/**
@@ -70,6 +74,7 @@ self::debug(__METHOD__.'():' . __LINE__ . ' path=' . $this->site_path);
 
 			// find the directory that WordPress is in
 			$wpconfig_path = DS_Utils::find_first_file( $this->site_path, 'wp-config.php' );
+$wpconfig_path = $this->site_path . 'wp-config.php';
 			$this->install_path = $this->trailingslashit( substr( $wpconfig_path, 0, -13 ) );
 self::debug(__METHOD__.'():' . __LINE__ . ' install_path=' . $this->install_path);
 
