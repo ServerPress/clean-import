@@ -93,6 +93,7 @@ self::debug(__METHOD__.'():' . __LINE__ . ' backup wp-config');
 			// collect wp-config data
 			$this->config_file = $wp_normal_config_file = new DS_ConfigFile( $wpconfig );
 self::debug(__METHOD__.'():' . __LINE__ . ' config_file=' . $wpconfig );
+self::debug(__METHOD__.'():' . __LINE__ . ' contents=' . file_get_contents($wpconfig));
 
 			$db_user = $wp_normal_config_file->get_key( 'DB_USER' );
 			$db_password = $wp_normal_config_file->get_key( 'DB_PASSWORD' );
@@ -102,8 +103,62 @@ self::debug(__METHOD__.'():' . __LINE__ . ' config_file=' . $wpconfig );
 
 			$wp_home = $wp_normal_config_file->get_key( 'WP_HOME' );
 			$wp_siteurl = $wp_normal_config_file->get_key( 'WP_SITEURL' );
-self::debug(__METHOD__.'()' . __LINE__ . ' dbuser=' . $db_user . '  db_pass=' . $db_password . '  prefix=' . $table_prefix . '  home=' . $wp_home);
+self::debug(__METHOD__.'()' . __LINE__ . ' dbuser=' . $db_user . '  db_pass=' . $db_password . '  prefix=' . $table_prefix);
 
+			// if missing, get wp-config settings information from Preferences file
+
+			$site_entry = $ds_runtime->preferences->sites->{$siteName};
+
+			// check database user and password
+			if ( empty( $db_user ) && empty( $db_password ) ) {
+				$db_user = $site_entry->dbName;
+				$db_password = $site_entry->dbPass;
+			}
+
+self::debug(__METHOD__.'():' . __LINE__ . ' table prefix="' . $table_prefix . '"');
+			// find the table prefix
+			if ( empty( $table_prefix ) ) {
+				$db_file = $ds_runtime->last_ui_event->info[2] . 'database.sql';
+				if ( file_exists( $db_file ) ) {
+					$fh = fopen( $db_file, 'r' );
+					if ( FALSE !== $fh ) {
+						do {
+							$line = fgets( $fh );
+							if ( FALSE !== $line ) {
+								// look for a line like: "CREATE TABLE `xxx_posts` ("
+								if ( FALSE !== ( $create = stripos( $line, 'CREATE TABLE `' ) ) &&
+									FALSE !== ( $posts = stripos( $line, '_posts` (' ) ) ) {
+									$start = $create + 14;
+									$table_prefix = substr( $line, $start, $posts - $start + 1 );
+								}
+							}
+						} while ( empty( $table_prefix ) && !feof( $fh ) );
+						fclose( $fh );
+					} else {
+self::debug(__METHOD__.'():' . __LINE__ . ' error opening database.sql file');
+					}
+				} else {
+self::debug(__METHOD__.'():' . __LINE__ . ' unable to find database.sql file ' . $db_file);
+				}
+			}
+
+			// check to see if the SSL plugin is active
+			$has_ssl = FALSE;
+			foreach ( $ds_runtime->preferences->{'ds-plugins'} as $plugin => $dir ) {
+				if ( FALSE !== stripos( $plugin, 'ssl' ) ) {
+					$has_ssl = TRUE;
+					break;
+				}
+			}
+
+self::debug(__METHOD__.'():' . __LINE__ . '  home=' . $wp_home . ' siteurl=' . $wp_siteurl);
+			// check for WP_HOME and WP_SITEURL
+			if ( empty( $wp_home ) ) {
+				$wp_home = ( $has_ssl ? 'https://' : 'http://' ) . $site_entry->siteName . '/';
+			}
+			if ( empty( $wp_siteurl ) ) {
+				$wp_siteurl = ( $has_ssl ? 'https://' : 'http://' ) . $site_entry->siteName . '/';
+			}
 
 self::debug(__METHOD__.'()' . __LINE__ . ' setting DB configurations');
 			// set the configuration info in the new wp-config
@@ -148,6 +203,8 @@ self::debug(__METHOD__.'()' . __LINE__ . ' setting table prefix');
 			$clean_config_file->set_type( 'php-variable' );
 			$clean_config_file->set_key( 'table_prefix', $table_prefix );
 
+			// TODO: set WP_HOME and WP_SITEURL constants
+
 self::debug(__METHOD__.'()' . __LINE__ . ' saving new config file');
 			// save the new wp-config file
 			// TODO: move this after plugin-specific updates??
@@ -162,7 +219,7 @@ self::debug(__METHOD__.'()' . __LINE__ . ' saving new config file');
 				'FLYWHEEL_PLUGIN_DIR',
 			);
 			if ( $this->has_constant( $flywheel_constants ) ) {
-DS_Clean_Import::debug(__METHOD__.'()' . __LINE__ . ' found presence of Flywheel host platform - removing references');
+self::debug(__METHOD__.'()' . __LINE__ . ' found presence of Flywheel host platform - removing references');
 				require dirname( __FILE__ ) . '/inc/flywheel.php';		
 				$flywheel = new DS_Clean_Import_Flywheel();
 				$flywheel->clean_import();
@@ -175,7 +232,7 @@ DS_Clean_Import::debug(__METHOD__.'()' . __LINE__ . ' found presence of Flywheel
 				'WPE_CLUSTER_ID',
 			);
 			if ( $this->has_constant( $wpengine_constants ) ) {
-DS_Clean_Import::debug(__METHOD__.'()' . __LINE__ . ' found presence of WPEngine host platform - removing references');
+self::debug(__METHOD__.'()' . __LINE__ . ' found presence of WPEngine host platform - removing references');
 				$wpengine = $this->load_class( 'WPEngine' );
 				$wpengine->clean_import();
 			}
@@ -213,7 +270,7 @@ self::debug(__METHOD__.'()' . __LINE__ . ' clean import processing complete');
 		 */
 		private function load_class( $class )
 		{
-DS_Clean_Import::debug(__METHOD__."('{$class}')");
+self::debug(__METHOD__."('{$class}')");
 			require dirname( __FILE__ ) . '/inc/' . strtolower( $class ) . '.php';
 			$classname = 'DS_Clean_Import_' . $class;
 			$instance = new $classname();
@@ -231,8 +288,7 @@ DS_Clean_Import::debug(__METHOD__."('{$class}')");
 			if ( ! $dh = @opendir( $dir ) )
 				return;
 
-			while ( FALSE !== ( $obj = readdir( $dh ) ) )
-			{
+			while ( FALSE !== ( $obj = readdir( $dh ) ) ) {
 				if ( '.' === $obj || '..' === $obj )
 					continue;
 
@@ -339,7 +395,7 @@ DS_Clean_Import::debug(__METHOD__.'()' . __LINE__ . ' wrote ' . count( $newdata 
 		}
 
 		/**
-		 * Check is one of a list of constants exists in the config file.
+		 * Check if one of a list of constants exists in the config file.
 		 * @param array $constants List of constants to search for
 		 * @return boolean TRUE if one or more of the constants exists; otherwise FALSE
 		 */
