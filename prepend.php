@@ -116,7 +116,7 @@ self::debug(__METHOD__.'()' . __LINE__ . ' dbuser=' . $db_user . '  db_pass=' . 
 self::debug(__METHOD__.'():' . __LINE__ . ' table prefix=' . var_export($table_prefix, TRUE));
 			// find the table prefix
 			if ( empty( $table_prefix ) ) {
-				$db_file = $ds_runtime->last_ui_event->info[1] . 'database.sql';
+				$db_file = $this->site_path . 'database.sql';
 self::debug(__METHOD__.'():' . __LINE__ . ' searching database file: ' . $db_file);
 				if ( file_exists( $db_file ) ) {
 					$fh = fopen( $db_file, 'r' );
