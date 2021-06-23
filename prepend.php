@@ -62,6 +62,7 @@ self::debug(__METHOD__.'():' . __LINE__ . ' files in "' . $dir . '": ' . var_exp
 self::debug(__METHOD__.'(): starting clean import process');
 
 			global $ds_runtime;
+self::debug(__METHOD__.'():' . __LINE__ . ' info: ' . var_export($ds_runtime->last_ui_event, TRUE));
 
 			// ensure trailing directory separator for both platforms #34
 			if ( isset( $ds_runtime->last_ui_event->info[2] ) )
@@ -99,10 +100,7 @@ self::debug(__METHOD__.'():' . __LINE__ . ' contents=' . file_get_contents($wpco
 			$db_password = $wp_normal_config_file->get_key( 'DB_PASSWORD' );
 			$wp_normal_config_file->set_type( 'php-variable' );
 			$table_prefix = $wp_normal_config_file->get_key( 'table_prefix' );
-			$wp_normal_config_file->set_type( 'php-define' );
 
-			$wp_home = $wp_normal_config_file->get_key( 'WP_HOME' );
-			$wp_siteurl = $wp_normal_config_file->get_key( 'WP_SITEURL' );
 self::debug(__METHOD__.'()' . __LINE__ . ' dbuser=' . $db_user . '  db_pass=' . $db_password . '  prefix=' . $table_prefix);
 
 			// if missing, get wp-config settings information from Preferences file
@@ -115,10 +113,11 @@ self::debug(__METHOD__.'()' . __LINE__ . ' dbuser=' . $db_user . '  db_pass=' . 
 				$db_password = $site_entry->dbPass;
 			}
 
-self::debug(__METHOD__.'():' . __LINE__ . ' table prefix="' . $table_prefix . '"');
+self::debug(__METHOD__.'():' . __LINE__ . ' table prefix=' . var_export($table_prefix, TRUE));
 			// find the table prefix
 			if ( empty( $table_prefix ) ) {
-				$db_file = $ds_runtime->last_ui_event->info[2] . 'database.sql';
+				$db_file = $ds_runtime->last_ui_event->info[1] . 'database.sql';
+self::debug(__METHOD__.'():' . __LINE__ . ' searching database file: ' . $db_file);
 				if ( file_exists( $db_file ) ) {
 					$fh = fopen( $db_file, 'r' );
 					if ( FALSE !== $fh ) {
@@ -142,23 +141,14 @@ self::debug(__METHOD__.'():' . __LINE__ . ' unable to find database.sql file ' .
 				}
 			}
 
-			// check to see if the SSL plugin is active
-			$has_ssl = FALSE;
-			foreach ( $ds_runtime->preferences->{'ds-plugins'} as $plugin => $dir ) {
-				if ( FALSE !== stripos( $plugin, 'ssl' ) ) {
-					$has_ssl = TRUE;
-					break;
-				}
-			}
-
-self::debug(__METHOD__.'():' . __LINE__ . '  home=' . $wp_home . ' siteurl=' . $wp_siteurl);
-			// check for WP_HOME and WP_SITEURL
-			if ( empty( $wp_home ) ) {
-				$wp_home = ( $has_ssl ? 'https://' : 'http://' ) . $site_entry->siteName . '/';
-			}
-			if ( empty( $wp_siteurl ) ) {
-				$wp_siteurl = ( $has_ssl ? 'https://' : 'http://' ) . $site_entry->siteName . '/';
-			}
+			// find WP_HOME and WP_SITEURL and comment them out
+			$wp_normal_config_file->set_type( 'php-define' );
+			$wp_home = $wp_normal_config_file->get_key( 'WP_HOME', FALSE );
+			if ( FALSE !== $wp_home )
+				$wp_normal_config_file->comment();
+			$wp_siteurl = $wp_normal_config_file->get_key( 'WP_SITEURL', FALSE );
+			if ( FALSE !== $wp_siteurl )
+				$wp_normal_config_file->comment();
 
 self::debug(__METHOD__.'()' . __LINE__ . ' setting DB configurations');
 			// set the configuration info in the new wp-config
@@ -341,7 +331,7 @@ DS_Clean_Import::debug(__METHOD__.'()' . __LINE__ . ' recreating .htaccess conte
 		 */
 		private function rename_plugin_files()
 		{
-DS_Clean_Import::debug(__METHOD__.'()' . __LINE__ . ' renaming plugins that can interfere with local hosting');
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' renaming plugins that can interfere with local hosting');
 			$plugins = $this->load_class( 'Plugins' );
 			$plugins->clean_import();
 		}
