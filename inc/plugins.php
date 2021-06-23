@@ -8,7 +8,7 @@ class DS_Clean_Import_Plugins extends DS_Clean_Import_Base
 {
 	// non-optional: these plugins will always be disabled due to issues caused by them
 	private $_non_optional = array(
-		'advanced-cache',						// WP Caching
+		'advanced-cache',									// WP Caching
 		'all-in-one-wp-security-and-firewall',
 		'broken-link-checker',								// WPEngine
 		'cdn-enabler',
@@ -16,12 +16,12 @@ class DS_Clean_Import_Plugins extends DS_Clean_Import_Base
 		'gd-system-plugin',									// WPEngine
 		'gd-system-plugin.php',								// WPEngine
 		'ithemes-security-pro',
-		'iwp-client',									// Infinite WP
+		'iwp-client',										// Infinite WP
 		'managewp',
 		'portable-phpmyadmin',								// WPEngine
 		'quick-cache',										// WPEngine
 		'quick-cache-pro',									// WPEngine
-		'sg-cachepress',								// SiteGround's CachePress
+		'sg-cachepress',									// SiteGround's CachePress
 		'stream',
 		'sucuri-scanner',
 		'versionpress',										// WPEngine
@@ -34,6 +34,7 @@ class DS_Clean_Import_Plugins extends DS_Clean_Import_Base
 		'wp-phpmyadmin',									// WPEngine
 		'wp-rocket',
 		'wp-super-cache',									// WPEngine
+		'litespeed-cache',									// LiteSPeed Cache
 	);
 	// optional: these plugins can be configured by the user to be disabled or not
 	private $_optional = array(
@@ -104,6 +105,7 @@ class DS_Clean_Import_Plugins extends DS_Clean_Import_Base
 		'managewp' => 'wp-content/mu-plugins/0-worker.php',
 		'advanced-cache' => 'wp-content/advanced-cache.php',
 		'advanced-cache' => 'wp-content/object-cache.php',
+		'litespeed-cache' => 'wp-content/advanced-cache.php',
 		'wp-fastest-cache' => 'wp-content/cache',
 		'wp-super-cache' => 'wp-content/wp-cache-config.php',
 		'w3-total-cache' => 'wp-content/w3tc-config',
