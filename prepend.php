@@ -7,6 +7,7 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT', FALSE ) ) {
 	class DS_Clean_Import
 	{
 		const DEBUG_LOG = TRUE;						// set to TRUE to enable logging
+		const INFO_FILE = 'ds-dirinfo.tmp';			// saves information between site_preimport and site_imported
 
 		public static $instance = NULL;
 
@@ -37,6 +38,7 @@ self::debug(__METHOD__.'(): ui event=' . var_export($ds_runtime->last_ui_event, 
 			// ensure trailing directory separator for both platforms #34
 			if ( isset( $ds_runtime->last_ui_event->info[2] ) )
 				$ds_runtime->last_ui_event->info[2] = rtrim( $ds_runtime->last_ui_event->info[2], '\\/' ) . DIRECTORY_SEPARATOR;
+			$this->save_info( $ds_runtime->last_ui_event->info );
 
 			// first, any processors to move files into the expected place
 			$duplicator = $this->load_class( 'Duplicator' );
@@ -72,6 +74,7 @@ self::debug(__METHOD__.'():' . __LINE__ . ' info: ' . var_export($ds_runtime->la
 self::debug(__METHOD__.'():' . __LINE__ . ' site name=' . $this->site_name);
 			$this->site_path = $this->trailingslashit( $ds_runtime->preferences->sites->{$siteName}->sitePath );
 self::debug(__METHOD__.'():' . __LINE__ . ' path=' . $this->site_path);
+			$locations = $this->get_info();
 
 			// find the directory that WordPress is in
 			$wpconfig_path = DS_Utils::find_first_file( $this->site_path, 'wp-config.php' );
@@ -116,7 +119,7 @@ self::debug(__METHOD__.'()' . __LINE__ . ' dbuser=' . $db_user . '  db_pass=' . 
 self::debug(__METHOD__.'():' . __LINE__ . ' table prefix=' . var_export($table_prefix, TRUE));
 			// find the table prefix
 			if ( empty( $table_prefix ) ) {
-				$db_file = $this->site_path . 'database.sql';
+				$db_file = $locations[2] . 'database.sql';
 self::debug(__METHOD__.'():' . __LINE__ . ' searching database file: ' . $db_file);
 				if ( file_exists( $db_file ) ) {
 					$fh = fopen( $db_file, 'r' );
@@ -409,6 +412,33 @@ DS_Clean_Import::debug(__METHOD__.'()' . __LINE__ . ' wrote ' . count( $newdata 
 		{
 			$val = rtrim( $val, '/\\' ) . '/';
 			return $val;
+		}
+
+		/**
+		 * Saves information provided in 'site_preimport' hook for later reference
+		 * @param array $dirs Array containing last_ui_event->info data
+		 */
+		private function save_info( $dirs )
+		{
+			$file = $dirs[1] . self::INFO_FILE;
+			$info = json_encode( $dirs );
+			file_put_contents( $file, $info );
+		}
+
+		/**
+		 * Retrieves information for use during 'site_imported' hook
+		 * @return type Array of data
+		 */
+		private function get_info()
+		{
+			global $ds_runtime;
+			$file = $this->site_path . self::INFO_FILE;
+self::debug(__METHOD__.'():' . __LINE__ . ' file=' . $file);
+			$data = file_get_contents( $file );
+			$info = json_decode( $data );
+self::debug(__METHOD__.'():' . __LINE__ . ' info=' . var_export($info, TRUE));
+#@#			@unlink( $file );
+			return $info;
 		}
 
 		/**
