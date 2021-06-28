@@ -12,6 +12,8 @@ class DS_Clean_Import_LogBlock extends DS_Clean_Import_Base
 		'itsec_logs',
 		'itsec_temp',
 		'rg_form_view',					// Gravity Forms views
+		'sgs_log_events',				// SiteGround Security log files
+		'sgs_log_visitors',
 		'tve_leads_event_log',			// Thrive Events leads
 		'wfFileMods',					// WordFence file modifications
 		'wfHoover',						// WordFence bad site checks
@@ -67,7 +69,7 @@ DS_Clean_Import::debug(__METHOD__.'(): found ' . count($files) . ' files');
 DS_Clean_Import::debug(__METHOD__.'(): checking file: ' . $file);
 			if ( '.sql' === substr( $file, -4 ) ) {
 				$workfile = $workdir . $file;
-copy($workfile, 'c:\\temp\\cidebug\\' . $file . 'b');
+//copy($workfile, 'c:\\temp\\cidebug\\' . $file . 'b');
 				$exec = $cmd . $params . ' ' . $workfile . ' >' . $workfile . '-out';
 DS_Clean_Import::debug(__METHOD__.'(): exec: ' . $exec);
 				$res = shell_exec( $exec );
@@ -75,7 +77,7 @@ DS_Clean_Import::debug(__METHOD__.'(): res: ' . $res);
 				rename( $workfile . '-out', $workfile );
 				++$count;
 
-copy($workfile, 'c:\\temp\\cidebug\\' . $file . 'a');
+//copy($workfile, 'c:\\temp\\cidebug\\' . $file . 'a');
 			}
 		}
 DS_Clean_Import::debug(__METHOD__.'(): modified ' . $count . ' files');
@@ -87,7 +89,7 @@ DS_Clean_Import::debug(__METHOD__.'(): modified ' . $count . ' files');
 	private function load_options()
 	{
 		// TODO: move into base class
-		require_once( dirname( __FILE__ ) . '/options.php' );
+		require_once( __DIR__ . '/options.php' );
 		$options = new DS_Clean_Import_Options();
 		$this->options = $options->get_options();
 	}
