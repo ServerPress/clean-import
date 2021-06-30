@@ -8,6 +8,7 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT', FALSE ) ) {
 	{
 		const DEBUG_LOG = TRUE;						// set to TRUE to enable logging
 		const INFO_FILE = 'ds-dirinfo.tmp';			// saves information between site_preimport and site_imported
+		const DB_WORK_FILE = 'ds-dbwork.tmp';		// temporary contents of database.sql for $table_prefix detection
 
 		public static $instance = NULL;
 
@@ -51,7 +52,12 @@ self::debug(__METHOD__.'(): ui event=' . var_export($ds_runtime->last_ui_event, 
 			$logblock->pre_import_process( $ds_runtime->last_ui_event->info );
 
 			$dir = $ds_runtime->last_ui_event->info[2] . DIRECTORY_SEPARATOR;
-			$files = scandir( $dir );
+			copy( $dir . 'database.sql', $ds_runtime->last_ui_event->info[1] . DIRECTORY_SEPARATOR . self::DB_WORK_FILE );
+
+$files = scandir( $dir );
+self::debug(__METHOD__.'():' . __LINE__ . ' files in "' . $dir . '": ' . var_export($files, TRUE));
+$dir = $ds_runtime->last_ui_event->info[1] . DIRECTORY_SEPARATOR;
+$files = scandir( $dir );
 self::debug(__METHOD__.'():' . __LINE__ . ' files in "' . $dir . '": ' . var_export($files, TRUE));
 		}
 
@@ -119,7 +125,7 @@ self::debug(__METHOD__.'()' . __LINE__ . ' dbuser=' . $db_user . '  db_pass=' . 
 self::debug(__METHOD__.'():' . __LINE__ . ' table prefix=' . var_export($table_prefix, TRUE));
 			// find the table prefix
 			if ( empty( $table_prefix ) ) {
-				$db_file = $locations[2] . 'database.sql';
+				$db_file = $locations[2] . self::DB_WORK_FILE;
 self::debug(__METHOD__.'():' . __LINE__ . ' searching database file: ' . $db_file);
 				if ( file_exists( $db_file ) ) {
 					$fh = fopen( $db_file, 'r' );
@@ -136,6 +142,8 @@ self::debug(__METHOD__.'():' . __LINE__ . ' searching database file: ' . $db_fil
 							}
 						} while ( empty( $table_prefix ) && !feof( $fh ) );
 						fclose( $fh );
+						// TODO: remove
+self::debug(__METHOD__.'():' . __LINE__ . ' ok to remove ' . $db_file); #@#
 					} else {
 self::debug(__METHOD__.'():' . __LINE__ . ' error opening database.sql file');
 					}
