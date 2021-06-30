@@ -17,6 +17,7 @@ class DS_Clean_Import_Plugins extends DS_Clean_Import_Base
 		'gd-system-plugin.php',								// WPEngine
 		'ithemes-security-pro',
 		'iwp-client',										// Infinite WP
+		'litespeed-cache',									// LiteSPeed Cache
 		'managewp',
 		'portable-phpmyadmin',								// WPEngine
 		'quick-cache',										// WPEngine
@@ -34,8 +35,8 @@ class DS_Clean_Import_Plugins extends DS_Clean_Import_Base
 		'wp-phpmyadmin',									// WPEngine
 		'wp-rocket',
 		'wp-super-cache',									// WPEngine
-		'litespeed-cache',									// LiteSPeed Cache
 	);
+
 	// optional: these plugins can be configured by the user to be disabled or not
 	private $_optional = array(
 		// WP File Cache
