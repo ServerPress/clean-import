@@ -129,8 +129,7 @@ self::debug(__METHOD__.'()' . __LINE__ . ' dbuser=' . $db_user . '  db_pass=' . 
 self::debug(__METHOD__.'():' . __LINE__ . ' table prefix=' . var_export($table_prefix, TRUE));
 			// find the table prefix
 			if ( empty( $table_prefix ) ) {
-				// TODO: $this->install_path
-				$db_file = $locations[2] . self::DB_WORK_FILE;
+				$db_file = $this->install_path . self::DB_WORK_FILE;
 self::debug(__METHOD__.'():' . __LINE__ . ' searching database file: ' . $db_file);
 				if ( file_exists( $db_file ) ) {
 					$fh = fopen( $db_file, 'r' );
