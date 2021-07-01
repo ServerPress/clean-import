@@ -25,7 +25,7 @@ if ( ! class_exists( 'DS_CLEAN_IMPORT', FALSE ) ) {
 		public function __construct()
 		{
 			self::$instance = $this;
-			require_once( dirname( __FILE__ ) . '/inc/base.php' );
+			require_once  __DIR__ . '/inc/base.php';
 		}
 
 		/**
@@ -51,12 +51,16 @@ self::debug(__METHOD__.'(): ui event=' . var_export($ds_runtime->last_ui_event, 
 			$logblock = $this->load_class( 'LogBlock' );
 			$logblock->pre_import_process( $ds_runtime->last_ui_event->info );
 
-			$dir = $ds_runtime->last_ui_event->info[2] . DIRECTORY_SEPARATOR;
-			copy( $dir . 'database.sql', $ds_runtime->last_ui_event->info[1] . DIRECTORY_SEPARATOR . self::DB_WORK_FILE );
+			// copy the database.sql file to a temp file so we can check it during 'site_imported'
+			$dbwork_src = $ds_runtime->last_ui_event->info[1] . 'database.sql';
+			$dbwork_dst = $ds_runtime->last_ui_event->info[1] . self::DB_WORK_FILE;
+			$res = copy( $dbwork_src, $dbwork_dst );
+self::debug(__METHOD__.'():' . __LINE__ . " copy('{$dbwork_src}', '{$dbwork_dst}'):" . var_export($res, TRUE));
 
+$dir = $ds_runtime->last_ui_event->info[2];
 $files = scandir( $dir );
 self::debug(__METHOD__.'():' . __LINE__ . ' files in "' . $dir . '": ' . var_export($files, TRUE));
-$dir = $ds_runtime->last_ui_event->info[1] . DIRECTORY_SEPARATOR;
+$dir = $ds_runtime->last_ui_event->info[1];
 $files = scandir( $dir );
 self::debug(__METHOD__.'():' . __LINE__ . ' files in "' . $dir . '": ' . var_export($files, TRUE));
 		}
@@ -125,6 +129,7 @@ self::debug(__METHOD__.'()' . __LINE__ . ' dbuser=' . $db_user . '  db_pass=' . 
 self::debug(__METHOD__.'():' . __LINE__ . ' table prefix=' . var_export($table_prefix, TRUE));
 			// find the table prefix
 			if ( empty( $table_prefix ) ) {
+				// TODO: $this->install_path
 				$db_file = $locations[2] . self::DB_WORK_FILE;
 self::debug(__METHOD__.'():' . __LINE__ . ' searching database file: ' . $db_file);
 				if ( file_exists( $db_file ) ) {
@@ -140,10 +145,11 @@ self::debug(__METHOD__.'():' . __LINE__ . ' searching database file: ' . $db_fil
 									$table_prefix = substr( $line, $start, $posts - $start + 1 );
 								}
 							}
-						} while ( empty( $table_prefix ) && !feof( $fh ) );
+						} while ( empty( $table_prefix ) && ! feof( $fh ) );
 						fclose( $fh );
-						// TODO: remove
 self::debug(__METHOD__.'():' . __LINE__ . ' ok to remove ' . $db_file); #@#
+						// TODO: remove
+#@#						@unlink( $db_file );
 					} else {
 self::debug(__METHOD__.'():' . __LINE__ . ' error opening database.sql file');
 					}
@@ -183,7 +189,8 @@ self::debug(__METHOD__.'()' . __LINE__ . ' setting salts');
 
 			// MultiSite info
 			$is_multisite = $wp_normal_config_file->get_key( 'MULTISITE' );
-			if ( !empty( $is_multisite ) ) {
+			// TODO: add check for $is_multisite == 'true'
+			if ( ! empty( $is_multisite ) ) {
 				$multisite = $this->load_class( 'MultiSite' );
 				$multisite->clean_import();
 			}
@@ -215,7 +222,13 @@ self::debug(__METHOD__.'()' . __LINE__ . ' saving new config file');
 			// the following are hosting-specific adjustments
 			//
 
+			// The following hosting providers are exclusive. Once we find one, we
+			// don't need to invoke any others.
+			$found_hosting = FALSE;
+
 			// Flywheel specific actions
+			// TODO: move constants list into classes and add ->has_constants() method
+			// TOOD: to detect usage
 			$flywheel_constants = array(
 				'FLYWHEEL_PLUGIN_DIR',
 			);
@@ -224,23 +237,31 @@ self::debug(__METHOD__.'()' . __LINE__ . ' found presence of Flywheel host platf
 				require dirname( __FILE__ ) . '/inc/flywheel.php';		
 				$flywheel = new DS_Clean_Import_Flywheel();
 				$flywheel->clean_import();
+				$found_hosting = TRUE;
 			}
 
-			// WPEngine specific actions
-			$wpengine_constants = array(
-				'WPE_APIKEY',
-				'WPE_SFTP_PORT',
-				'WPE_CLUSTER_ID',
-			);
-			if ( $this->has_constant( $wpengine_constants ) ) {
+			if ( ! $found_hosting ) {
+				// WPEngine specific actions
+				$wpengine_constants = array(
+					'WPE_APIKEY',
+					'WPE_SFTP_PORT',
+					'WPE_CLUSTER_ID',
+				);
+				if ( $this->has_constant( $wpengine_constants ) ) {
 self::debug(__METHOD__.'()' . __LINE__ . ' found presence of WPEngine host platform - removing references');
-				$wpengine = $this->load_class( 'WPEngine' );
-				$wpengine->clean_import();
+					$wpengine = $this->load_class( 'WPEngine' );
+					$wpengine->clean_import();
+					$found_hosting = TRUE;
+				}
 			}
 
-			// Endurance specific actions
-			$endurance = $this->load_class( 'Endurance' );
-			$endurance->clean_import();
+			if ( ! $found_hosting ) {
+				// Endurance specific actions
+				$endurance = $this->load_class( 'Endurance' );
+				$endurance->clean_import();
+				$found_hosting = TRUE;
+			}
+self::debug(__METHOD__.'():' . __LINE__ . ' found hosting=' . var_export($found_hosting, TRUE));
 
 			// completed host-specific changes
 
