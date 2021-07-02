@@ -6,8 +6,7 @@
 if ( ! class_exists( 'DS_CLEAN_IMPORT', FALSE ) ) {
 	class DS_Clean_Import
 	{
-		const DEBUG_LOG = TRUE;						// set to TRUE to enable logging
-		const INFO_FILE = 'ds-dirinfo.tmp';			// saves information between site_preimport and site_imported
+		const DEBUG_LOG = FALSE;						// set to TRUE to enable logging
 		const DB_WORK_FILE = 'ds-dbwork.tmp';		// temporary contents of database.sql for $table_prefix detection
 
 		public static $instance = NULL;
@@ -39,7 +38,6 @@ self::debug(__METHOD__.'(): ui event=' . var_export($ds_runtime->last_ui_event, 
 			// ensure trailing directory separator for both platforms #34
 			if ( isset( $ds_runtime->last_ui_event->info[2] ) )
 				$ds_runtime->last_ui_event->info[2] = rtrim( $ds_runtime->last_ui_event->info[2], '\\/' ) . DIRECTORY_SEPARATOR;
-			$this->save_info( $ds_runtime->last_ui_event->info );
 
 			// first, any processors to move files into the expected place
 			$duplicator = $this->load_class( 'Duplicator' );
@@ -84,7 +82,6 @@ self::debug(__METHOD__.'():' . __LINE__ . ' info: ' . var_export($ds_runtime->la
 self::debug(__METHOD__.'():' . __LINE__ . ' site name=' . $this->site_name);
 			$this->site_path = $this->trailingslashit( $ds_runtime->preferences->sites->{$siteName}->sitePath );
 self::debug(__METHOD__.'():' . __LINE__ . ' path=' . $this->site_path);
-			$locations = $this->get_info();
 
 			// find the directory that WordPress is in
 			$wpconfig_path = DS_Utils::find_first_file( $this->site_path, 'wp-config.php' );
@@ -233,7 +230,7 @@ self::debug(__METHOD__.'()' . __LINE__ . ' saving new config file');
 			);
 			if ( $this->has_constant( $flywheel_constants ) ) {
 self::debug(__METHOD__.'()' . __LINE__ . ' found presence of Flywheel host platform - removing references');
-				require dirname( __FILE__ ) . '/inc/flywheel.php';		
+				require __DIR__ . '/inc/flywheel.php';		
 				$flywheel = new DS_Clean_Import_Flywheel();
 				$flywheel->clean_import();
 				$found_hosting = TRUE;
@@ -292,7 +289,7 @@ self::debug(__METHOD__.'()' . __LINE__ . ' clean import processing complete');
 		private function load_class( $class )
 		{
 self::debug(__METHOD__."('{$class}')");
-			require dirname( __FILE__ ) . '/inc/' . strtolower( $class ) . '.php';
+			require __DIR__ . '/inc/' . strtolower( $class ) . '.php';
 			$classname = 'DS_Clean_Import_' . $class;
 			$instance = new $classname();
 			return $instance;
@@ -443,42 +440,15 @@ DS_Clean_Import::debug(__METHOD__.'()' . __LINE__ . ' wrote ' . count( $newdata 
 		}
 
 		/**
-		 * Saves information provided in 'site_preimport' hook for later reference
-		 * @param array $dirs Array containing last_ui_event->info data
-		 */
-		private function save_info( $dirs )
-		{
-			$file = $dirs[1] . self::INFO_FILE;
-			$info = json_encode( $dirs );
-			file_put_contents( $file, $info );
-		}
-
-		/**
-		 * Retrieves information for use during 'site_imported' hook
-		 * @return type Array of data
-		 */
-		private function get_info()
-		{
-			global $ds_runtime;
-			$file = $this->site_path . self::INFO_FILE;
-self::debug(__METHOD__.'():' . __LINE__ . ' file=' . $file);
-			$data = file_get_contents( $file );
-			$info = json_decode( $data );
-self::debug(__METHOD__.'():' . __LINE__ . ' info=' . var_export($info, TRUE));
-#@#			@unlink( $file );
-			return $info;
-		}
-
-		/**
 		 * Performs logging for debugging purposes
 		 * @param string $msg The message to write to the log file
 		 */
 		public static function debug( $msg )
 		{
-//return;
 			if ( self::DEBUG_LOG ) {
 				if ( NULL === self::$_log_file ) {
-					self::$_log_file = dirname( dirname( __FILE__ ) ) . '/~clean-import-log.txt';
+					// TODO: put this in the DS tmp directory
+					self::$_log_file = dirname( __DIR__ ) . '/~clean-import-log.txt';
 					self::$_log = @fopen( self::$_log_file, 'a+' );
 				}
 
@@ -490,6 +460,7 @@ self::debug(__METHOD__.'():' . __LINE__ . ' info=' . var_export($info, TRUE));
 					fflush( self::$_log );
 				}
 			}
+			// send logging to the Debug and Trace plugin if active
 			if ( function_exists( 'trace' ) )
 				trace( $msg );
 		}
@@ -500,8 +471,10 @@ self::debug(__METHOD__.'():' . __LINE__ . ' info=' . var_export($info, TRUE));
 		private function close_log()
 		{
 			// TODO: may not be needed
-			if ( FALSE !== self::$_log )
+			if ( FALSE !== self::$_log ) {
 				fclose( self::$_log );
+				self::$_log = FALSE;
+			}
 		}
 	}
 }
@@ -516,7 +489,7 @@ $wp_filter['wp_loaded'][0]['ds_clean_import_admin'] = array( 'function' => 'ds_c
 function ds_clean_import_admin()
 {
 	DS_Clean_Import::debug('ds_clean_import_admin() callback');
-	require_once( dirname( __FILE__ ) . '/inc/admin.php' );
+	require_once __DIR__ . '/inc/admin.php';
 }
 
 DS_Clean_Import::debug('***starting');
@@ -547,9 +520,9 @@ DS_Clean_Import::debug('***have an actionable event - process the site');
 /**
  * Load library classes
  */
-include_once( $ds_runtime->htdocs_dir . '/classes/gstring.php' );
-include_once( $ds_runtime->htdocs_dir . '/classes/class-ds-utils.php' );
-include_once( $ds_runtime->htdocs_dir . '/classes/class-ds-config-file.php' );
+include_once $ds_runtime->htdocs_dir . '/classes/gstring.php';
+include_once $ds_runtime->htdocs_dir . '/classes/class-ds-utils.php';
+include_once $ds_runtime->htdocs_dir . '/classes/class-ds-config-file.php';
 
 $clean_import = new DS_Clean_Import();
 
