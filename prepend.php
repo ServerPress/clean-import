@@ -143,9 +143,7 @@ self::debug(__METHOD__.'():' . __LINE__ . ' searching database file: ' . $db_fil
 							}
 						} while ( empty( $table_prefix ) && ! feof( $fh ) );
 						fclose( $fh );
-self::debug(__METHOD__.'():' . __LINE__ . ' ok to remove ' . $db_file); #@#
-						// TODO: remove
-#@#						@unlink( $db_file );
+						@unlink( $db_file );
 					} else {
 self::debug(__METHOD__.'():' . __LINE__ . ' error opening database.sql file');
 					}
