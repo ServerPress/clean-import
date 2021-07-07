@@ -54,6 +54,13 @@ self::debug(__METHOD__.'(): ui event=' . var_export($ds_runtime->last_ui_event, 
 			$dbwork_dst = $ds_runtime->last_ui_event->info[1] . self::DB_WORK_FILE;
 			$res = copy( $dbwork_src, $dbwork_dst );
 self::debug(__METHOD__.'():' . __LINE__ . " copy('{$dbwork_src}', '{$dbwork_dst}'):" . var_export($res, TRUE));
+			if ( FALSE === $res ) {
+				if ( ! file_exists( $dbwork_src ) )
+					self::debug(__METHOD__.'():' . __LINE__ . ' file "' . $dbwork_src . '" not found');
+				else
+					self::debug(__METHOD__.'():' . __LINE__ . ' file size: ' . filesize( $dbwork_src ));
+				self::debug(__METHOD__.'():' . __LINE__ . ' free space: ' . disk_free_space( $ds_runtime->last_ui_event->info[1] ));
+			}
 
 $dir = $ds_runtime->last_ui_event->info[2];
 $files = scandir( $dir );
@@ -145,10 +152,10 @@ self::debug(__METHOD__.'():' . __LINE__ . ' searching database file: ' . $db_fil
 						fclose( $fh );
 						@unlink( $db_file );
 					} else {
-self::debug(__METHOD__.'():' . __LINE__ . ' error opening database.sql file');
+self::debug(__METHOD__.'():' . __LINE__ . ' ERROR: cannot open database.sql file' . $db_file);
 					}
 				} else {
-self::debug(__METHOD__.'():' . __LINE__ . ' unable to find database.sql file ' . $db_file);
+self::debug(__METHOD__.'():' . __LINE__ . ' ERROR: unable to find database.sql file ' . $db_file);
 				}
 			}
 
