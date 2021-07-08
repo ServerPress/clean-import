@@ -6,6 +6,7 @@ class DS_Clean_Import_Duplicator extends DS_Clean_Import_Base
 	{
 DS_Clean_Import::debug(__METHOD__.'():' . var_export($info, TRUE));
 		$workdir = $info[2];			// get the temp directory archive was exported to
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' workdir=' . $workdir);
 
 		$files = NULL;
 
@@ -36,8 +37,10 @@ DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' renamed ' . $workdir . $f
 
 			// set up $dup_installer to contain proper directory name
 			$dup_installer = $workdir . 'dup-installer';
-			if ( ! is_dir( $dup_installer ) )
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' dup_installer="' . $dup_installer . '"');
+			if ( ! is_dir( $dup_installer ) && is_dir( $workdir . 'ds-dup-installer' ) )
 				$dup_installer = $workdir . 'ds-dup-installer';
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' dup_installer="' . $dup_installer . '"');
 
 			// scan for dup-installer/original_files_* directory
 DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' searching for "' . $dup_installer . '" directory');
@@ -119,6 +122,8 @@ DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' renamed ' . $sql_file . '
 					}
 				}
 
+			} else {
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' ERROR: no "' . $dup_installer . '" directory found');
 			} // is_dir( $dup_installer )
 		} // file_exists( 'wp-config' )
 
