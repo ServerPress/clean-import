@@ -43,7 +43,7 @@ DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' dup_installer="' . $dup_i
 DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' dup_installer="' . $dup_installer . '"');
 
 			// scan for dup-installer/original_files_* directory
-DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' searching for "' . $dup_installer . '" directory');
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' searching the "' . $dup_installer . '" directory');
 			if ( is_dir( $dup_installer ) ) {
 				$original_files = NULL;
 				$scandir = $dup_installer . DIRECTORY_SEPARATOR;
@@ -104,7 +104,7 @@ if ( ! file_exists( $workdir . '.htaccess' ) ) DS_Clean_Import::debug(__METHOD__
 				} // NULL !== $original_files
 
 				// look for database.sql file
-DS_Clean_Import::debug(__METHOD__.'(): checking for database.sql');
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' checking for database.sql');
 				if ( file_exists( $workdir . 'database.sql' ) ) {
 DS_Clean_Import::debug(__METHOD__.'(): database.sql already exists');
 				} else {
@@ -112,11 +112,11 @@ DS_Clean_Import::debug(__METHOD__.'(): database.sql already exists');
 DS_Clean_Import::debug(__METHOD__.'(): found ' . count($files) . ' files');
 	
 					foreach ( $files as $file ) {
-DS_Clean_Import::debug(__METHOD__.'(): checking file: ' . $file);
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' checking file: ' . $file);
 						if ( 'dup-database__' === substr( $file, 0, 14 ) && '.sql' === substr( $file, -4 ) ) {
 							$sql_file = $dup_installer . DIRECTORY_SEPARATOR . $file;
-							rename( $sql_file, $workdir . 'database.sql' );
-DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' renamed ' . $sql_file . ' to ' . $workdir . 'database.sql');
+							copy( $sql_file, $workdir . 'database.sql' ); // was: rename()
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' copied ' . $sql_file . ' to ' . $workdir . 'database.sql');
 							break;
 						}
 					}
