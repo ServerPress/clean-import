@@ -5,7 +5,9 @@ class DS_Clean_Import_Duplicator extends DS_Clean_Import_Base
 	public function pre_import_process( $info )
 	{
 DS_Clean_Import::debug(__METHOD__.'():' . var_export($info, TRUE));
+		$sitedir = $info[1];			// get the directory of the new site
 		$workdir = $info[2];			// get the temp directory archive was exported to
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' sitedir=' . $sitedir);
 DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' workdir=' . $workdir);
 
 		$files = NULL;
@@ -115,8 +117,10 @@ DS_Clean_Import::debug(__METHOD__.'(): found ' . count($files) . ' files');
 DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' checking file: ' . $file);
 						if ( 'dup-database__' === substr( $file, 0, 14 ) && '.sql' === substr( $file, -4 ) ) {
 							$sql_file = $dup_installer . DIRECTORY_SEPARATOR . $file;
-							copy( $sql_file, $workdir . 'database.sql' ); // was: rename()
-DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' copied ' . $sql_file . ' to ' . $workdir . 'database.sql');
+							$res = copy( $sql_file, $workdir . 'database.sql' ); // was: rename()
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' copied ' . $sql_file . ' to ' . $workdir . 'database.sql res=' . var_export($res, TRUE));
+							$res = copy( $sql_file, $sitedir . 'database.sql' );
+DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' copied ' . $sql_file . ' to ' . $sitedir . 'database.sql res=' . var_export($res, TRUE));
 							break;
 						}
 					}

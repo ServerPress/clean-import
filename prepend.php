@@ -52,14 +52,19 @@ self::debug(__METHOD__.'(): ui event=' . var_export($ds_runtime->last_ui_event, 
 			// copy the database.sql file to a temp file so we can check it during 'site_imported'
 			$dbwork_src = $ds_runtime->last_ui_event->info[1] . 'database.sql';
 			$dbwork_dst = $ds_runtime->last_ui_event->info[1] . self::DB_WORK_FILE;
-			$res = copy( $dbwork_src, $dbwork_dst );
+			if ( ! file_exists( $dbwork_dst ) && file_exists( $dbwork_src ) ) {
+				// copy from the site directory
+				$res = copy( $dbwork_src, $dbwork_dst );
 self::debug(__METHOD__.'():' . __LINE__ . " copy('{$dbwork_src}', '{$dbwork_dst}'):" . var_export($res, TRUE));
-			if ( FALSE === $res ) {
-				if ( ! file_exists( $dbwork_src ) )
-					self::debug(__METHOD__.'():' . __LINE__ . ' file "' . $dbwork_src . '" not found');
-				else
-					self::debug(__METHOD__.'():' . __LINE__ . ' file size: ' . filesize( $dbwork_src ));
-				self::debug(__METHOD__.'():' . __LINE__ . ' free space: ' . disk_free_space( $ds_runtime->last_ui_event->info[1] ));
+			}
+			if ( ! file_exists( $dbwork_dst ) ) {
+				// as a fallback, copy from the temp directory
+				$dbwork_src = $ds_runtime->last_ui_event->info[2] . 'database.sql';
+				$res = copy( $dbwork_src, $dbwork_dst );
+self::debug(__METHOD__.'():' . __LINE__ . " copy('{$dbwork_src}', '{$dbwork_dst}'):" . var_export($res, TRUE));
+			}
+			if ( ! file_exists ( $dbwork_dst ) ) {
+				self::debug(__METHOD__.'():' . __LINE__ . ' cannot find database.sql file. free space: ' . disk_free_space( $ds_runtime->last_ui_event->info[1] ));
 			}
 
 $dir = $ds_runtime->last_ui_event->info[2];
