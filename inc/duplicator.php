@@ -112,7 +112,7 @@ DS_Clean_Import::debug(__METHOD__.'(): database.sql already exists');
 				} else {
 					$files = scandir( $dup_installer . DIRECTORY_SEPARATOR );
 DS_Clean_Import::debug(__METHOD__.'(): found ' . count($files) . ' files');
-	
+
 					foreach ( $files as $file ) {
 DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' checking file: ' . $file);
 						if ( 'dup-database__' === substr( $file, 0, 14 ) && '.sql' === substr( $file, -4 ) ) {
@@ -125,7 +125,6 @@ DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' copied ' . $sql_file . ' 
 						}
 					}
 				}
-
 			} else {
 DS_Clean_Import::debug(__METHOD__.'():' . __LINE__ . ' ERROR: no "' . $dup_installer . '" directory found');
 			} // is_dir( $dup_installer )

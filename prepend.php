@@ -148,7 +148,7 @@ self::debug(__METHOD__.'():' . __LINE__ . ' searching database file: ' . $db_fil
 							if ( FALSE !== $line ) {
 								// look for a line like: "CREATE TABLE `xxx_posts` ("
 								if ( FALSE !== ( $create = stripos( $line, 'CREATE TABLE `' ) ) &&
-									FALSE !== ( $posts = stripos( $line, '_posts` (' ) ) ) {
+									FALSE !== ( $posts = stripos( $line, '_options` (' ) ) ) {
 									$start = $create + 14;
 									$table_prefix = substr( $line, $start, $posts - $start + 1 );
 								}
@@ -157,10 +157,10 @@ self::debug(__METHOD__.'():' . __LINE__ . ' searching database file: ' . $db_fil
 						fclose( $fh );
 						@unlink( $db_file );
 					} else {
-self::debug(__METHOD__.'():' . __LINE__ . ' ERROR: cannot open database.sql file' . $db_file);
+self::debug(__METHOD__.'():' . __LINE__ . ' ERROR: cannot open ds-dbwork.tmp file' . $db_file);
 					}
 				} else {
-self::debug(__METHOD__.'():' . __LINE__ . ' ERROR: unable to find database.sql file ' . $db_file);
+self::debug(__METHOD__.'():' . __LINE__ . ' ERROR: unable to find ds-dbwork.tmp file ' . $db_file);
 				}
 			}
 
